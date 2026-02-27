@@ -26,7 +26,6 @@ const FinanceTrendCard = ({ timeframe }: { timeframe: string }) => (
             <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />
             <Tooltip
               formatter={(value: number) => fmtCurrency(value)}
-              }
               contentStyle={{ fontSize: 12, borderRadius: 8, borderColor: "hsl(var(--border))" }}
             />
             <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
