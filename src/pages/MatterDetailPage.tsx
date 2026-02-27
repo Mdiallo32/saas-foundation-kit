@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Plus, AlertTriangle, Download } from "lucide-react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import MatterBudgetCards from "@/components/matters/MatterBudgetCards";
@@ -8,8 +9,23 @@ import BudgetProgress from "@/components/matters/BudgetProgress";
 import TimesheetTable from "@/components/matters/TimesheetTable";
 import TimesheetModal from "@/components/matters/TimesheetModal";
 import InvoiceList from "@/components/invoices/InvoiceList";
-import { mockMatters, mockTimesheets, mockInvoices } from "@/lib/mock-matters";
+import { mockMatters, mockTimesheets, mockInvoices, type Timesheet } from "@/lib/mock-matters";
 import { mockClients } from "@/lib/mock-clients";
+
+function downloadTimesheetsCSV(timesheets: Timesheet[], matterId: string) {
+  const header = "Date,Collaborator,Hours,Description,Amount";
+  const rows = timesheets.map((t) =>
+    [format(new Date(t.date), "yyyy-MM-dd"), t.user, t.hours, `"${t.description}"`, (t.hours * t.rate).toFixed(2)].join(",")
+  );
+  const csv = [header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `timesheets-${matterId}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const MatterDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -69,9 +85,14 @@ const MatterDetailPage = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold font-heading">Timesheets</h2>
-          <Button size="sm" onClick={() => setTsModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-1.5" /> Log Time
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => downloadTimesheetsCSV(timesheets, matter.id)} disabled={timesheets.length === 0}>
+              <Download className="h-4 w-4 mr-1.5" /> Download CSV
+            </Button>
+            <Button size="sm" onClick={() => setTsModalOpen(true)}>
+              <Plus className="h-4 w-4 mr-1.5" /> Log Time
+            </Button>
+          </div>
         </div>
         <TimesheetTable timesheets={timesheets} />
       </div>
