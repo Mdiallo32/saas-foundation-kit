@@ -33,7 +33,7 @@ const ClientTable = ({ clients }: ClientTableProps) => {
           </TableHeader>
           <TableBody>
             {clients.map((c) => (
-              <TableRow key={c.id} className="cursor-pointer">
+              <TableRow key={c.id} className="cursor-pointer" onClick={() => navigate(`/clients/${c.id}`)}>
                 <TableCell className="font-medium">{c.name}</TableCell>
                 <TableCell>{c.email}</TableCell>
                 <TableCell className="font-mono text-xs">{c.vatNumber}</TableCell>
