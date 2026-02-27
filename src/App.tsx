@@ -9,6 +9,7 @@ import { TeamPage, FinancePage, SettingsPage } from "./pages/PlaceholderPages";
 import MattersPage from "./pages/MattersPage";
 import ClientsPage from "./pages/ClientsPage";
 import ClientDetailPage from "./pages/ClientDetailPage";
+import MatterDetailPage from "./pages/MatterDetailPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/clients" element={<ClientsPage />} />
             <Route path="/clients/:id" element={<ClientDetailPage />} />
             <Route path="/matters" element={<MattersPage />} />
+            <Route path="/matters/:id" element={<MatterDetailPage />} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/finance" element={<FinancePage />} />
             <Route path="/settings" element={<SettingsPage />} />

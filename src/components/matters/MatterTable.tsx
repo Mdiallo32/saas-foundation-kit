@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import type { Matter } from "@/lib/mock-matters";
@@ -21,6 +22,8 @@ interface MatterTableProps {
 }
 
 const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
+  const navigate = useNavigate();
+
   if (matters.length === 0) {
     return (
       <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
@@ -47,7 +50,7 @@ const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
             {matters.map((m) => {
               const remaining = m.budgetTotal - m.budgetUsed;
               return (
-                <TableRow key={m.id}>
+                <TableRow key={m.id} className="cursor-pointer" onClick={() => navigate(`/matters/${m.id}`)}>
                   <TableCell className="font-medium">{m.title}</TableCell>
                   {showClient && <TableCell className="text-muted-foreground">{clientName(m.clientId)}</TableCell>}
                   <TableCell>{fmt(m.budgetTotal)}</TableCell>
@@ -71,7 +74,7 @@ const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
         {matters.map((m) => {
           const remaining = m.budgetTotal - m.budgetUsed;
           return (
-            <div key={m.id} className="rounded-lg border border-border p-4 bg-card space-y-2">
+            <div key={m.id} className="rounded-lg border border-border p-4 bg-card space-y-2 cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => navigate(`/matters/${m.id}`)}>
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">{m.title}</p>
                 <Badge variant={statusVariant[m.status]} className="capitalize text-xs">
