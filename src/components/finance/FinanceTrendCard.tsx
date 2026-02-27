@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { fmtCurrency } from "@/lib/money";
 
 const data = [
   { month: "Sep", revenue: 52000, costs: 19000 },
