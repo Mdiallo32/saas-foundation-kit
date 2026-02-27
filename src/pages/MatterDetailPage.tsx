@@ -12,6 +12,21 @@ import InvoiceList from "@/components/invoices/InvoiceList";
 import { mockMatters, mockTimesheets, mockInvoices, type Timesheet } from "@/lib/mock-matters";
 import { mockClients } from "@/lib/mock-clients";
 
+function downloadTimesheetsCSV(timesheets: Timesheet[], matterId: string) {
+  const header = "Date,Collaborator,Hours,Description,Amount";
+  const rows = timesheets.map((t) =>
+    [format(new Date(t.date), "yyyy-MM-dd"), t.user, t.hours, `"${t.description}"`, (t.hours * t.rate).toFixed(2)].join(",")
+  );
+  const csv = [header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `timesheets-${matterId}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 const MatterDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
