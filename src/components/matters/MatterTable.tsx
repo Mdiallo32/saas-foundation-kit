@@ -50,7 +50,7 @@ const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
             {matters.map((m) => {
               const remaining = m.budgetTotal - m.budgetUsed;
               return (
-                <TableRow key={m.id}>
+                <TableRow key={m.id} className="cursor-pointer" onClick={() => navigate(`/matters/${m.id}`)}>
                   <TableCell className="font-medium">{m.title}</TableCell>
                   {showClient && <TableCell className="text-muted-foreground">{clientName(m.clientId)}</TableCell>}
                   <TableCell>{fmt(m.budgetTotal)}</TableCell>
