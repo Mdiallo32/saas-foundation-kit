@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { fmtCurrency } from "@/lib/money";
 
 const data = [
   { month: "Sep", revenue: 52000, costs: 19000 },
@@ -24,9 +25,7 @@ const FinanceTrendCard = ({ timeframe }: { timeframe: string }) => (
             <XAxis dataKey="month" tick={{ fontSize: 12 }} className="text-muted-foreground" />
             <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />
             <Tooltip
-              formatter={(value: number) =>
-                new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)
-              }
+              formatter={(value: number) => fmtCurrency(value)}
               contentStyle={{ fontSize: 12, borderRadius: 8, borderColor: "hsl(var(--border))" }}
             />
             <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />

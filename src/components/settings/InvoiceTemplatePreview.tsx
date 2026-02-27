@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { fmtCurrency } from "@/lib/money";
 
 interface PreviewProps {
   prefix: string;
@@ -8,8 +9,7 @@ interface PreviewProps {
   footerNote: string;
 }
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(n);
+const fmt = (n: number) => fmtCurrency(n, 2);
 
 const InvoiceTemplatePreview = ({ prefix, showSlogan, vatRate, footerNote }: PreviewProps) => {
   const amountHT = 8500;
