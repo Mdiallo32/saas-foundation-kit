@@ -22,6 +22,8 @@ interface MatterTableProps {
 }
 
 const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
+  const navigate = useNavigate();
+
   if (matters.length === 0) {
     return (
       <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
