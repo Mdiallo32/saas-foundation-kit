@@ -14,7 +14,8 @@ const ClientsPage = () => {
     () =>
       mockClients.filter((c) => {
         const q = search.toLowerCase();
-        return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.vatNumber.toLowerCase().includes(q);
+        const id = (c.type === "company" ? c.vatNumber : c.nationalNumber) ?? "";
+        return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || id.toLowerCase().includes(q);
       }),
     [search],
   );
