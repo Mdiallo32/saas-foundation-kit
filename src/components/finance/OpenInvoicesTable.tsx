@@ -1,9 +1,9 @@
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { fmtCurrency } from "@/lib/money";
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(n);
+const fmt = (n: number) => fmtCurrency(n, 2);
 
 interface OpenInvoice {
   id: string;

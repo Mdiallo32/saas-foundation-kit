@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import type { Matter } from "@/lib/mock-matters";
 import { mockClients } from "@/lib/mock-clients";
+import { fmtCurrency } from "@/lib/money";
 
 const statusVariant: Record<Matter["status"], "default" | "secondary" | "outline" | "destructive"> = {
   open: "default",
@@ -11,8 +12,7 @@ const statusVariant: Record<Matter["status"], "default" | "secondary" | "outline
   closed: "destructive",
 };
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+const fmt = fmtCurrency;
 
 const clientName = (id: string) => mockClients.find((c) => c.id === id)?.name ?? "Unknown";
 

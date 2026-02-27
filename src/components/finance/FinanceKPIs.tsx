@@ -2,9 +2,7 @@ import { DollarSign, FileText, TrendingUp, Users, Flame, BarChart3 } from "lucid
 import { Card, CardContent } from "@/components/ui/card";
 import { mockTimesheets } from "@/lib/mock-matters";
 import { mockCollaborators } from "@/lib/mock-team";
-
-const fmtCurrency = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+import { fmtCurrency } from "@/lib/money";
 
 const rateByName = Object.fromEntries(mockCollaborators.map((c) => [c.name, c.hourlyRate]));
 

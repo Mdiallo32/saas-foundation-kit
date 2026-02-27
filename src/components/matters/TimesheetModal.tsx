@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { fmtCurrency } from "@/lib/money";
 
 interface TimesheetModalProps {
   open: boolean;
@@ -11,8 +12,7 @@ interface TimesheetModalProps {
   hourlyRate: number;
 }
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(n);
+const fmt = (n: number) => fmtCurrency(n, 2);
 
 const TimesheetModal = ({ open, onOpenChange, hourlyRate }: TimesheetModalProps) => {
   const [description, setDescription] = useState("");

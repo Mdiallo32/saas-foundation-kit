@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
 import type { Invoice } from "@/lib/mock-matters";
+import { fmtCurrency } from "@/lib/money";
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(n);
+const fmt = (n: number) => fmtCurrency(n, 2);
 
 const InvoiceCard = ({ invoice }: { invoice: Invoice }) => {
   const vat = invoice.amountHT * invoice.vatRate;

@@ -2,9 +2,9 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { mockTimesheets } from "@/lib/mock-matters";
 import { mockCollaborators } from "@/lib/mock-team";
+import { fmtCurrency } from "@/lib/money";
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+const fmt = fmtCurrency;
 
 const initials = (name: string) => name.split(" ").map((w) => w[0]).join("").toUpperCase();
 

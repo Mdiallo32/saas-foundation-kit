@@ -1,9 +1,9 @@
 import { DollarSign, TrendingDown, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Matter } from "@/lib/mock-matters";
+import { fmtCurrency } from "@/lib/money";
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+const fmt = fmtCurrency;
 
 const MatterBudgetCards = ({ matter }: { matter: Matter }) => {
   const remaining = matter.budgetTotal - matter.budgetUsed;

@@ -1,9 +1,9 @@
 import { format } from "date-fns";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import type { Timesheet } from "@/lib/mock-matters";
+import { fmtCurrency } from "@/lib/money";
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+const fmt = fmtCurrency;
 
 const TimesheetTable = ({ timesheets }: { timesheets: Timesheet[] }) => {
   if (timesheets.length === 0) {

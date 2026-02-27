@@ -25,8 +25,7 @@ const FinanceTrendCard = ({ timeframe }: { timeframe: string }) => (
             <XAxis dataKey="month" tick={{ fontSize: 12 }} className="text-muted-foreground" />
             <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />
             <Tooltip
-              formatter={(value: number) =>
-                new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)
+              formatter={(value: number) => fmtCurrency(value)}
               }
               contentStyle={{ fontSize: 12, borderRadius: 8, borderColor: "hsl(var(--border))" }}
             />
