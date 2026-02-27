@@ -85,9 +85,14 @@ const MatterDetailPage = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold font-heading">Timesheets</h2>
-          <Button size="sm" onClick={() => setTsModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-1.5" /> Log Time
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => downloadTimesheetsCSV(timesheets, matter.id)} disabled={timesheets.length === 0}>
+              <Download className="h-4 w-4 mr-1.5" /> Download CSV
+            </Button>
+            <Button size="sm" onClick={() => setTsModalOpen(true)}>
+              <Plus className="h-4 w-4 mr-1.5" /> Log Time
+            </Button>
+          </div>
         </div>
         <TimesheetTable timesheets={timesheets} />
       </div>
