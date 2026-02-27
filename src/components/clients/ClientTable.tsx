@@ -8,6 +8,8 @@ interface ClientTableProps {
 }
 
 const ClientTable = ({ clients }: ClientTableProps) => {
+  const navigate = useNavigate();
+
   if (clients.length === 0) {
     return (
       <div className="flex items-center justify-center h-40 text-muted-foreground">
