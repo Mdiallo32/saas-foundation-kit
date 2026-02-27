@@ -47,7 +47,7 @@ const ClientTable = ({ clients }: ClientTableProps) => {
       {/* Mobile stacked cards */}
       <div className="md:hidden space-y-3">
         {clients.map((c) => (
-          <div key={c.id} className="rounded-lg border border-border p-4 space-y-1.5 bg-card">
+          <div key={c.id} className="rounded-lg border border-border p-4 space-y-1.5 bg-card cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => navigate(`/clients/${c.id}`)}>
             <p className="font-medium text-sm">{c.name}</p>
             <p className="text-xs text-muted-foreground">{c.email}</p>
             <div className="flex justify-between text-xs text-muted-foreground">
