@@ -74,7 +74,7 @@ const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
         {matters.map((m) => {
           const remaining = m.budgetTotal - m.budgetUsed;
           return (
-            <div key={m.id} className="rounded-lg border border-border p-4 bg-card space-y-2">
+            <div key={m.id} className="rounded-lg border border-border p-4 bg-card space-y-2 cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => navigate(`/matters/${m.id}`)}>
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">{m.title}</p>
                 <Badge variant={statusVariant[m.status]} className="capitalize text-xs">
