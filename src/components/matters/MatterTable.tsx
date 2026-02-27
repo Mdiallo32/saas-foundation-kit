@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import type { Matter } from "@/lib/mock-matters";
+import { mockClients } from "@/lib/mock-clients";
 
 const statusVariant: Record<Matter["status"], "default" | "secondary" | "outline" | "destructive"> = {
   open: "default",
@@ -12,7 +13,14 @@ const statusVariant: Record<Matter["status"], "default" | "secondary" | "outline
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
-const MatterTable = ({ matters }: { matters: Matter[] }) => {
+const clientName = (id: string) => mockClients.find((c) => c.id === id)?.name ?? "Unknown";
+
+interface MatterTableProps {
+  matters: Matter[];
+  showClient?: boolean;
+}
+
+const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
   if (matters.length === 0) {
     return (
       <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
@@ -29,6 +37,8 @@ const MatterTable = ({ matters }: { matters: Matter[] }) => {
           <TableHeader>
             <TableRow className="bg-muted/40">
               <TableHead>Title</TableHead>
+              {showClient && <TableHead>Client</TableHead>}
+              <TableHead>Budget Initial</TableHead>
               <TableHead>Budget Remaining</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -39,8 +49,10 @@ const MatterTable = ({ matters }: { matters: Matter[] }) => {
               return (
                 <TableRow key={m.id}>
                   <TableCell className="font-medium">{m.title}</TableCell>
+                  {showClient && <TableCell className="text-muted-foreground">{clientName(m.clientId)}</TableCell>}
+                  <TableCell>{fmt(m.budgetTotal)}</TableCell>
                   <TableCell className={remaining <= 0 ? "text-destructive font-semibold" : ""}>
-                    {fmt(remaining)} <span className="text-muted-foreground text-xs">/ {fmt(m.budgetTotal)}</span>
+                    {fmt(remaining)}
                   </TableCell>
                   <TableCell>
                     <Badge variant={statusVariant[m.status]} className="capitalize text-xs">
@@ -66,9 +78,15 @@ const MatterTable = ({ matters }: { matters: Matter[] }) => {
                   {m.status.replace("-", " ")}
                 </Badge>
               </div>
-              <p className={`text-xs ${remaining <= 0 ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
-                {fmt(remaining)} remaining of {fmt(m.budgetTotal)}
-              </p>
+              {showClient && (
+                <p className="text-xs text-muted-foreground">{clientName(m.clientId)}</p>
+              )}
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Initial: {fmt(m.budgetTotal)}</span>
+                <span className={remaining <= 0 ? "text-destructive font-semibold" : ""}>
+                  Remaining: {fmt(remaining)}
+                </span>
+              </div>
             </div>
           );
         })}
