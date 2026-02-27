@@ -3,27 +3,29 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { ClientType } from "@/lib/mock-clients";
 
 interface ClientFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const fields = [
+const baseFields = [
   { name: "name", label: "Name", type: "text", required: true },
   { name: "email", label: "Email", type: "email", required: true },
   { name: "phone", label: "Phone", type: "tel", required: false },
   { name: "address", label: "Address", type: "text", required: false },
-  { name: "vatNumber", label: "VAT Number", type: "text", required: true },
 ] as const;
 
-type FieldName = (typeof fields)[number]["name"];
+type FieldName = "name" | "email" | "phone" | "address" | "vatNumber" | "nationalNumber";
 
 const ClientFormModal = ({ open, onOpenChange }: ClientFormModalProps) => {
+  const [clientType, setClientType] = useState<ClientType>("company");
   const [values, setValues] = useState<Record<FieldName, string>>({
-    name: "", email: "", phone: "", address: "", vatNumber: "",
+    name: "", email: "", phone: "", address: "", vatNumber: "", nationalNumber: "",
   });
-  const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<FieldName | "type", string>>>({});
   const [submitted, setSubmitted] = useState(false);
 
   const validate = () => {
@@ -31,7 +33,8 @@ const ClientFormModal = ({ open, onOpenChange }: ClientFormModalProps) => {
     if (!values.name.trim()) e.name = "Name is required";
     if (!values.email.trim()) e.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) e.email = "Invalid email";
-    if (!values.vatNumber.trim()) e.vatNumber = "VAT number is required";
+    if (clientType === "company" && !values.vatNumber.trim()) e.vatNumber = "VAT number is required";
+    if (clientType === "physical" && !values.nationalNumber.trim()) e.nationalNumber = "National number is required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -40,9 +43,9 @@ const ClientFormModal = ({ open, onOpenChange }: ClientFormModalProps) => {
     ev.preventDefault();
     setSubmitted(true);
     if (!validate()) return;
-    // UI-only: just close
     onOpenChange(false);
-    setValues({ name: "", email: "", phone: "", address: "", vatNumber: "" });
+    setValues({ name: "", email: "", phone: "", address: "", vatNumber: "", nationalNumber: "" });
+    setClientType("company");
     setErrors({});
     setSubmitted(false);
   };
@@ -66,7 +69,21 @@ const ClientFormModal = ({ open, onOpenChange }: ClientFormModalProps) => {
           <DialogDescription>Fill in the details to add a new client.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-          {fields.map((f) => (
+          {/* Client type selector */}
+          <div className="space-y-1.5">
+            <Label htmlFor="clientType">Client type<span className="text-destructive ml-0.5">*</span></Label>
+            <Select value={clientType} onValueChange={(v) => setClientType(v as ClientType)}>
+              <SelectTrigger id="clientType">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="company">Company</SelectItem>
+                <SelectItem value="physical">Physical person</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {baseFields.map((f) => (
             <div key={f.name} className="space-y-1.5">
               <Label htmlFor={f.name}>
                 {f.label}
@@ -79,15 +96,38 @@ const ClientFormModal = ({ open, onOpenChange }: ClientFormModalProps) => {
                 onChange={(e) => handleChange(f.name, e.target.value)}
                 aria-invalid={!!errors[f.name]}
               />
-              {errors[f.name] && (
-                <p className="text-xs text-destructive">{errors[f.name]}</p>
-              )}
+              {errors[f.name] && <p className="text-xs text-destructive">{errors[f.name]}</p>}
             </div>
           ))}
+
+          {/* Conditional identifier field */}
+          {clientType === "company" ? (
+            <div className="space-y-1.5">
+              <Label htmlFor="vatNumber">VAT Number<span className="text-destructive ml-0.5">*</span></Label>
+              <Input
+                id="vatNumber"
+                value={values.vatNumber}
+                onChange={(e) => handleChange("vatNumber", e.target.value)}
+                aria-invalid={!!errors.vatNumber}
+              />
+              {errors.vatNumber && <p className="text-xs text-destructive">{errors.vatNumber}</p>}
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label htmlFor="nationalNumber">National Number<span className="text-destructive ml-0.5">*</span></Label>
+              <Input
+                id="nationalNumber"
+                value={values.nationalNumber}
+                onChange={(e) => handleChange("nationalNumber", e.target.value)}
+                placeholder="e.g. 90.01.15-123.45"
+                aria-invalid={!!errors.nationalNumber}
+              />
+              {errors.nationalNumber && <p className="text-xs text-destructive">{errors.nationalNumber}</p>}
+            </div>
+          )}
+
           <DialogFooter className="pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button type="submit">Create Client</Button>
           </DialogFooter>
         </form>
