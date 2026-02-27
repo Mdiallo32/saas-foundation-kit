@@ -12,6 +12,7 @@ import MattersPage from "./pages/MattersPage";
 import ClientsPage from "./pages/ClientsPage";
 import ClientDetailPage from "./pages/ClientDetailPage";
 import MatterDetailPage from "./pages/MatterDetailPage";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
