@@ -5,7 +5,7 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 );
 
 
-export const MattersPage = () => <PlaceholderPage title="Matters" />;
+
 export const TeamPage = () => <PlaceholderPage title="Team" />;
 export const FinancePage = () => <PlaceholderPage title="Finance" />;
 export const SettingsPage = () => <PlaceholderPage title="Settings" />;
