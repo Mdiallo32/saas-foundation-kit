@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Plus, AlertTriangle, Download } from "lucide-react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import MatterBudgetCards from "@/components/matters/MatterBudgetCards";
@@ -8,7 +9,7 @@ import BudgetProgress from "@/components/matters/BudgetProgress";
 import TimesheetTable from "@/components/matters/TimesheetTable";
 import TimesheetModal from "@/components/matters/TimesheetModal";
 import InvoiceList from "@/components/invoices/InvoiceList";
-import { mockMatters, mockTimesheets, mockInvoices } from "@/lib/mock-matters";
+import { mockMatters, mockTimesheets, mockInvoices, type Timesheet } from "@/lib/mock-matters";
 import { mockClients } from "@/lib/mock-clients";
 
 const MatterDetailPage = () => {
