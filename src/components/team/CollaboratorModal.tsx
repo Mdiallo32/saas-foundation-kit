@@ -12,8 +12,8 @@ interface CollaboratorModalProps {
 
 const roles = ["Senior Partner", "Partner", "Associate", "Junior Associate", "Paralegal"] as const;
 
-type Fields = { name: string; email: string; role: string };
-const empty: Fields = { name: "", email: "", role: "" };
+type Fields = { name: string; email: string; role: string; hourlyRate: string };
+const empty: Fields = { name: "", email: "", role: "", hourlyRate: "" };
 
 const CollaboratorModal = ({ open, onOpenChange }: CollaboratorModalProps) => {
   const [values, setValues] = useState<Fields>(empty);
@@ -26,6 +26,8 @@ const CollaboratorModal = ({ open, onOpenChange }: CollaboratorModalProps) => {
     if (!values.email.trim()) e.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) e.email = "Invalid email";
     if (!values.role) e.role = "Select a role";
+    const rate = Number(values.hourlyRate);
+    if (!values.hourlyRate.trim() || isNaN(rate) || rate <= 0) e.hourlyRate = "Enter a valid rate";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -63,19 +65,26 @@ const CollaboratorModal = ({ open, onOpenChange }: CollaboratorModalProps) => {
             <Input id="collab-email" type="email" value={values.email} onChange={(e) => set("email", e.target.value)} aria-invalid={!!errors.email} />
             {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
           </div>
-          <div className="space-y-1.5">
-            <Label>Role <span className="text-destructive">*</span></Label>
-            <Select value={values.role} onValueChange={(v) => set("role", v)}>
-              <SelectTrigger aria-invalid={!!errors.role}>
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                {roles.map((r) => (
-                  <SelectItem key={r} value={r}>{r}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.role && <p className="text-xs text-destructive">{errors.role}</p>}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Role <span className="text-destructive">*</span></Label>
+              <Select value={values.role} onValueChange={(v) => set("role", v)}>
+                <SelectTrigger aria-invalid={!!errors.role}>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.map((r) => (
+                    <SelectItem key={r} value={r}>{r}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.role && <p className="text-xs text-destructive">{errors.role}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="collab-rate">Hourly Rate <span className="text-destructive">*</span></Label>
+              <Input id="collab-rate" type="number" min={0} placeholder="e.g. 150" value={values.hourlyRate} onChange={(e) => set("hourlyRate", e.target.value)} aria-invalid={!!errors.hourlyRate} />
+              {errors.hourlyRate && <p className="text-xs text-destructive">{errors.hourlyRate}</p>}
+            </div>
           </div>
           <DialogFooter className="pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>

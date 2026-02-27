@@ -1,25 +1,46 @@
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { mockTimesheets } from "@/lib/mock-matters";
+import { mockCollaborators } from "@/lib/mock-team";
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
-interface MemberRevenue {
+const initials = (name: string) => name.split(" ").map((w) => w[0]).join("").toUpperCase();
+
+interface MemberRow {
   name: string;
   hours: number;
   revenue: number;
+  cost: number;
+  profit: number;
   avgRate: number;
 }
 
-const data: MemberRevenue[] = [
-  { name: "Sarah Chen", hours: 48.5, revenue: 21825, avgRate: 450 },
-  { name: "James Okafor", hours: 36, revenue: 11700, avgRate: 325 },
-  { name: "Emily Tran", hours: 34.5, revenue: 9660, avgRate: 280 },
-  { name: "David Kimura", hours: 26, revenue: 7150, avgRate: 275 },
-  { name: "Maria Lopez", hours: 18, revenue: 3600, avgRate: 200 },
-];
+const rateByName = Object.fromEntries(mockCollaborators.map((c) => [c.name, c.hourlyRate]));
 
-const initials = (name: string) => name.split(" ").map((w) => w[0]).join("").toUpperCase();
+const data: MemberRow[] = (() => {
+  const map = new Map<string, { hours: number; revenue: number; cost: number }>();
+  for (const t of mockTimesheets) {
+    const prev = map.get(t.user) ?? { hours: 0, revenue: 0, cost: 0 };
+    const costRate = rateByName[t.user] ?? 0;
+    map.set(t.user, {
+      hours: prev.hours + t.hours,
+      revenue: prev.revenue + t.hours * t.rate,
+      cost: prev.cost + t.hours * costRate,
+    });
+  }
+  return Array.from(map.entries())
+    .map(([name, v]) => ({
+      name,
+      hours: v.hours,
+      revenue: v.revenue,
+      cost: v.cost,
+      profit: v.revenue - v.cost,
+      avgRate: v.hours > 0 ? Math.round(v.revenue / v.hours) : 0,
+    }))
+    .sort((a, b) => b.revenue - a.revenue);
+})();
 
 const RevenueByMember = () => (
   <>
@@ -28,8 +49,10 @@ const RevenueByMember = () => (
         <TableHeader>
           <TableRow className="bg-muted/40">
             <TableHead>Member</TableHead>
-            <TableHead className="text-right">Hours Billed</TableHead>
+            <TableHead className="text-right">Hours</TableHead>
             <TableHead className="text-right">Revenue</TableHead>
+            <TableHead className="text-right">Cost</TableHead>
+            <TableHead className="text-right">Profit</TableHead>
             <TableHead className="text-right">Avg Rate</TableHead>
           </TableRow>
         </TableHeader>
@@ -46,6 +69,8 @@ const RevenueByMember = () => (
               </TableCell>
               <TableCell className="text-right">{m.hours}h</TableCell>
               <TableCell className="text-right font-semibold">{fmt(m.revenue)}</TableCell>
+              <TableCell className="text-right text-muted-foreground">{fmt(m.cost)}</TableCell>
+              <TableCell className="text-right font-semibold text-emerald-600">{fmt(m.profit)}</TableCell>
               <TableCell className="text-right text-muted-foreground">{fmt(m.avgRate)}/hr</TableCell>
             </TableRow>
           ))}
@@ -65,6 +90,10 @@ const RevenueByMember = () => (
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>{m.hours}h billed</span>
             <span className="font-semibold text-foreground">{fmt(m.revenue)}</span>
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Cost: {fmt(m.cost)}</span>
+            <span className="font-semibold text-emerald-600">Profit: {fmt(m.profit)}</span>
           </div>
         </div>
       ))}

@@ -1,19 +1,29 @@
-import { DollarSign, FileText, TrendingUp, Users, Flame } from "lucide-react";
+import { DollarSign, FileText, TrendingUp, Users, Flame, BarChart3 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { mockTimesheets } from "@/lib/mock-matters";
+import { mockCollaborators } from "@/lib/mock-team";
 
-const fmt = (n: number) =>
+const fmtCurrency = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
+const rateByName = Object.fromEntries(mockCollaborators.map((c) => [c.name, c.hourlyRate]));
+
+const totalRevenue = mockTimesheets.reduce((s, t) => s + t.hours * t.rate, 0);
+const totalCost = mockTimesheets.reduce((s, t) => s + t.hours * (rateByName[t.user] ?? 0), 0);
+const grossProfit = totalRevenue - totalCost;
+const margin = totalRevenue > 0 ? Math.round((grossProfit / totalRevenue) * 100) : 0;
+
 const kpis = [
-  { label: "Forecasted Profit", value: fmt(62400), sub: "This month", icon: DollarSign },
-  { label: "Open Invoices", value: "4", sub: fmt(18276), icon: FileText },
+  { label: "Forecasted Profit", value: fmtCurrency(62400), sub: "This month", icon: DollarSign },
+  { label: "Gross Profit", value: fmtCurrency(grossProfit), sub: `${margin}% margin`, icon: BarChart3 },
+  { label: "Open Invoices", value: "4", sub: fmtCurrency(18276), icon: FileText },
   { label: "ROI", value: "138%", sub: "+6% vs last quarter", icon: TrendingUp },
-  { label: "Revenue / Member", value: fmt(16864), sub: "5 active members", icon: Users },
-  { label: "Monthly Burn", value: fmt(21900), sub: "Payroll + overhead", icon: Flame },
+  { label: "Revenue / Member", value: fmtCurrency(totalRevenue / mockCollaborators.length), sub: `${mockCollaborators.length} active members`, icon: Users },
+  { label: "Monthly Burn", value: fmtCurrency(21900), sub: "Payroll + overhead", icon: Flame },
 ];
 
 const FinanceKPIs = () => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
     {kpis.map((k) => (
       <Card key={k.label}>
         <CardContent className="pt-5 pb-4 px-5">

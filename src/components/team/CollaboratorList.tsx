@@ -48,7 +48,7 @@ const CollaboratorList = ({ collaborators }: { collaborators: Collaborator[] }) 
               </Avatar>
               <div className="min-w-0">
                 <p className="font-medium text-sm truncate">{c.name}</p>
-                <p className="text-xs text-muted-foreground">{c.role}</p>
+                <p className="text-xs text-muted-foreground">{c.role} · ${c.hourlyRate}/hr</p>
               </div>
             </div>
 
