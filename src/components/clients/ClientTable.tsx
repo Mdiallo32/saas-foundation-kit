@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import type { Client } from "@/lib/mock-clients";
 
@@ -7,6 +8,8 @@ interface ClientTableProps {
 }
 
 const ClientTable = ({ clients }: ClientTableProps) => {
+  const navigate = useNavigate();
+
   if (clients.length === 0) {
     return (
       <div className="flex items-center justify-center h-40 text-muted-foreground">
@@ -30,7 +33,7 @@ const ClientTable = ({ clients }: ClientTableProps) => {
           </TableHeader>
           <TableBody>
             {clients.map((c) => (
-              <TableRow key={c.id} className="cursor-pointer">
+              <TableRow key={c.id} className="cursor-pointer" onClick={() => navigate(`/clients/${c.id}`)}>
                 <TableCell className="font-medium">{c.name}</TableCell>
                 <TableCell>{c.email}</TableCell>
                 <TableCell className="font-mono text-xs">{c.vatNumber}</TableCell>
@@ -44,7 +47,7 @@ const ClientTable = ({ clients }: ClientTableProps) => {
       {/* Mobile stacked cards */}
       <div className="md:hidden space-y-3">
         {clients.map((c) => (
-          <div key={c.id} className="rounded-lg border border-border p-4 space-y-1.5 bg-card">
+          <div key={c.id} className="rounded-lg border border-border p-4 space-y-1.5 bg-card cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => navigate(`/clients/${c.id}`)}>
             <p className="font-medium text-sm">{c.name}</p>
             <p className="text-xs text-muted-foreground">{c.email}</p>
             <div className="flex justify-between text-xs text-muted-foreground">
