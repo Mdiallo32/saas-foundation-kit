@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { mockClients } from "@/lib/mock-clients";
+import { useCreateMatter, useClients } from "@/data/hooks";
+import { useToast } from "@/hooks/use-toast";
 
 interface MatterFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialClientId?: string;
 }
 
 type Fields = {
@@ -22,10 +24,24 @@ type Fields = {
 
 const empty: Fields = { clientId: "", title: "", description: "", budgetInitial: "", hourlyRate: "" };
 
-const MatterFormModal = ({ open, onOpenChange }: MatterFormModalProps) => {
+const MatterFormModal = ({ open, onOpenChange, initialClientId }: MatterFormModalProps) => {
   const [values, setValues] = useState<Fields>(empty);
   const [errors, setErrors] = useState<Partial<Record<keyof Fields, string>>>({});
   const [submitted, setSubmitted] = useState(false);
+
+  const { mutate: createMatter, isPending } = useCreateMatter();
+  const { data: clients } = useClients();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (open) {
+      if (initialClientId) {
+        setValues({ ...empty, clientId: initialClientId });
+      } else {
+        setValues(empty);
+      }
+    }
+  }, [open, initialClientId]);
 
   const validate = () => {
     const e: Partial<Record<keyof Fields, string>> = {};
@@ -43,7 +59,23 @@ const MatterFormModal = ({ open, onOpenChange }: MatterFormModalProps) => {
     ev.preventDefault();
     setSubmitted(true);
     if (!validate()) return;
-    onOpenChange(false);
+
+    createMatter({
+      title: values.title.trim(),
+      clientId: values.clientId,
+      budgetTotal: Number(values.budgetInitial),
+      hourlyRate: values.hourlyRate ? Number(values.hourlyRate) : 0,
+      status: "open",
+    }, {
+      onSuccess: (data) => {
+        toast({ title: "Matter created", description: `${data.title} has been added.` });
+        onOpenChange(false);
+        reset();
+      }
+    });
+  };
+
+  const reset = () => {
     setValues(empty);
     setErrors({});
     setSubmitted(false);
@@ -64,13 +96,17 @@ const MatterFormModal = ({ open, onOpenChange }: MatterFormModalProps) => {
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           {/* Client */}
           <div className="space-y-1.5">
-            <Label>Client <span className="text-destructive">*</span></Label>
-            <Select value={values.clientId} onValueChange={(v) => set("clientId", v)}>
-              <SelectTrigger aria-invalid={!!errors.clientId}>
+            <Label htmlFor="matter-client">Client <span className="text-destructive">*</span></Label>
+            <Select
+              value={values.clientId}
+              onValueChange={(v) => set("clientId", v)}
+              disabled={!!initialClientId}
+            >
+              <SelectTrigger id="matter-client" autoFocus aria-invalid={!!errors.clientId}>
                 <SelectValue placeholder="Select client" />
               </SelectTrigger>
               <SelectContent>
-                {mockClients.map((c) => (
+                {clients?.map((c) => (
                   <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                 ))}
               </SelectContent>
@@ -107,7 +143,9 @@ const MatterFormModal = ({ open, onOpenChange }: MatterFormModalProps) => {
 
           <DialogFooter className="pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit">Create Matter</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Creating..." : "Create Matter"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { Mail, Phone, MapPin, Hash, CalendarDays, User, Building2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Client } from "@/lib/mock-clients";
+import type { Client } from "@/types";
 
 const Row = ({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) => (
   <div className="flex items-start gap-3 text-sm">

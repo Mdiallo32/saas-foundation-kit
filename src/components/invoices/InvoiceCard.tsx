@@ -8,7 +8,12 @@ import { fmtCurrency } from "@/lib/money";
 
 const fmt = (n: number) => fmtCurrency(n, 2);
 
-const InvoiceCard = ({ invoice }: { invoice: Invoice }) => {
+interface InvoiceCardProps {
+  invoice: Invoice;
+  onMarkPaid?: (id: string) => void;
+}
+
+const InvoiceCard = ({ invoice, onMarkPaid }: InvoiceCardProps) => {
   const vat = invoice.amountHT * invoice.vatRate;
   const ttc = invoice.amountHT + vat;
 
@@ -39,9 +44,9 @@ const InvoiceCard = ({ invoice }: { invoice: Invoice }) => {
 
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>Issued {format(new Date(invoice.issuedAt), "dd MMM yyyy")}</span>
-          {invoice.status === "pending" && (
-            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1">
-              <CheckCircle className="h-3.5 w-3.5" /> Mark Paid
+          {invoice.status === "pending" && onMarkPaid && (
+            <Button variant="ghost" size="sm" onClick={() => onMarkPaid(invoice.id)}>
+              <CheckCircle className="h-4 w-4 mr-1.5" /> Mark Paid
             </Button>
           )}
         </div>

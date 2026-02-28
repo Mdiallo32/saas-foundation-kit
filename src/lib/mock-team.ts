@@ -1,12 +1,4 @@
-export interface Collaborator {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  hourlyRate: number;
-  avatar?: string;
-  matterIds: string[];
-}
+import { Collaborator } from "@/types";
 
 export const mockCollaborators: Collaborator[] = [
   { id: "u1", name: "Sarah Chen", email: "s.chen@firm.com", role: "Senior Partner", hourlyRate: 180, matterIds: ["m1", "m5"] },

@@ -5,20 +5,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { fmtCurrency } from "@/lib/money";
+import { useCreateTimesheet } from "@/data/hooks";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
 interface TimesheetModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  matterId: string;
   hourlyRate: number;
 }
 
 const fmt = (n: number) => fmtCurrency(n, 2);
 
-const TimesheetModal = ({ open, onOpenChange, hourlyRate }: TimesheetModalProps) => {
+const TimesheetModal = ({ open, onOpenChange, matterId, hourlyRate }: TimesheetModalProps) => {
   const [description, setDescription] = useState("");
   const [hours, setHours] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+
+  const { mutate: createTimesheet, isPending } = useCreateTimesheet(matterId);
+  const { toast } = useToast();
 
   const hoursNum = parseFloat(hours) || 0;
   const preview = useMemo(() => hoursNum * hourlyRate, [hoursNum, hourlyRate]);
@@ -36,7 +43,23 @@ const TimesheetModal = ({ open, onOpenChange, hourlyRate }: TimesheetModalProps)
     ev.preventDefault();
     setSubmitted(true);
     if (!validate()) return;
-    onOpenChange(false);
+
+    createTimesheet({
+      description: description.trim(),
+      hours: hoursNum,
+      rate: hourlyRate,
+      date: format(new Date(), "yyyy-MM-dd"),
+      user: "Sarah Chen", // Should ideally come from auth context
+    }, {
+      onSuccess: () => {
+        toast({ title: "Time entry logged", description: "Matter budget has been updated." });
+        onOpenChange(false);
+        reset();
+      }
+    });
+  };
+
+  const reset = () => {
     setDescription("");
     setHours("");
     setErrors({});
@@ -59,7 +82,7 @@ const TimesheetModal = ({ open, onOpenChange, hourlyRate }: TimesheetModalProps)
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div className="space-y-1.5">
             <Label htmlFor="ts-desc">Description <span className="text-destructive">*</span></Label>
-            <Input id="ts-desc" value={description} onChange={(e) => set("description", e.target.value)} aria-invalid={!!errors.description} />
+            <Input id="ts-desc" autoFocus value={description} onChange={(e) => set("description", e.target.value)} aria-invalid={!!errors.description} />
             {errors.description && <p className="text-xs text-destructive">{errors.description}</p>}
           </div>
 
@@ -82,9 +105,11 @@ const TimesheetModal = ({ open, onOpenChange, hourlyRate }: TimesheetModalProps)
             </div>
           </div>
 
-          <DialogFooter className="pt-1">
+          <DialogFooter className="pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit">Log Entry</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Logging..." : "Log Entry"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

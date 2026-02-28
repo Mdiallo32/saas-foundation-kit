@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./layouts/AppLayout";
 import Index from "./pages/Index";
+import { PageBoundary } from "@/components/boundaries/page-boundary";
 import SettingsPage from "./pages/SettingsPage";
 import FinancePage from "./pages/FinancePage";
 import TeamPage from "./pages/TeamPage";
@@ -15,6 +16,8 @@ import MatterDetailPage from "./pages/MatterDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
+import { DashboardSkeleton, TablePageSkeleton } from "@/components/ui/skeleton-loaders";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -22,14 +25,14 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route element={<AppLayout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/clients" element={<ClientsPage />} />
-            <Route path="/clients/:id" element={<ClientDetailPage />} />
-            <Route path="/matters" element={<MattersPage />} />
-            <Route path="/matters/:id" element={<MatterDetailPage />} />
+            <Route path="/" element={<PageBoundary fallback={<DashboardSkeleton />}><Index /></PageBoundary>} />
+            <Route path="/clients" element={<PageBoundary fallback={<TablePageSkeleton />}><ClientsPage /></PageBoundary>} />
+            <Route path="/clients/:id" element={<PageBoundary><ClientDetailPage /></PageBoundary>} />
+            <Route path="/matters" element={<PageBoundary fallback={<TablePageSkeleton />}><MattersPage /></PageBoundary>} />
+            <Route path="/matters/:id" element={<PageBoundary><MatterDetailPage /></PageBoundary>} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/finance" element={<FinancePage />} />
             <Route path="/settings" element={<SettingsPage />} />

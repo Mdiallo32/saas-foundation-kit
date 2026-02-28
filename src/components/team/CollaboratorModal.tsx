@@ -57,7 +57,7 @@ const CollaboratorModal = ({ open, onOpenChange }: CollaboratorModalProps) => {
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div className="space-y-1.5">
             <Label htmlFor="collab-name">Name <span className="text-destructive">*</span></Label>
-            <Input id="collab-name" value={values.name} onChange={(e) => set("name", e.target.value)} aria-invalid={!!errors.name} />
+            <Input id="collab-name" autoFocus value={values.name} onChange={(e) => set("name", e.target.value)} aria-invalid={!!errors.name} />
             {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
           </div>
           <div className="space-y-1.5">
@@ -67,9 +67,9 @@ const CollaboratorModal = ({ open, onOpenChange }: CollaboratorModalProps) => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Role <span className="text-destructive">*</span></Label>
+              <Label htmlFor="collab-role">Role <span className="text-destructive">*</span></Label>
               <Select value={values.role} onValueChange={(v) => set("role", v)}>
-                <SelectTrigger aria-invalid={!!errors.role}>
+                <SelectTrigger id="collab-role" aria-invalid={!!errors.role}>
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>

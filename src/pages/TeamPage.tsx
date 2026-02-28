@@ -12,7 +12,7 @@ const TeamPage = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight font-heading">Team</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Team</h1>
           <p className="text-sm text-muted-foreground mt-1">{mockCollaborators.length} collaborators</p>
         </div>
         <Button onClick={() => setModalOpen(true)} size="sm">

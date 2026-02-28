@@ -1,18 +1,29 @@
 import { DollarSign, TrendingDown, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { CardSkeleton } from "@/components/ui/skeleton-loaders";
 import type { Matter } from "@/lib/mock-matters";
 import { fmtCurrency } from "@/lib/money";
 
 const fmt = fmtCurrency;
 
-const MatterBudgetCards = ({ matter }: { matter: Matter }) => {
+const MatterBudgetCards = ({ matter, isLoading = false }: { matter?: Matter; isLoading?: boolean }) => {
+  if (isLoading || !matter) {
+    return (
+      <div className="grid sm:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <CardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
   const remaining = matter.budgetTotal - matter.budgetUsed;
   const pct = matter.budgetTotal > 0 ? Math.round((matter.budgetUsed / matter.budgetTotal) * 100) : 0;
 
   const cards = [
-    { label: "Budget Initial", value: fmt(matter.budgetTotal), icon: DollarSign, sub: `Rate: ${fmt(matter.hourlyRate)}/hr` },
-    { label: "Budget Used", value: fmt(matter.budgetUsed), icon: TrendingDown, sub: `${pct}% consumed` },
-    { label: "Budget Remaining", value: fmt(remaining), icon: Clock, sub: remaining > 0 ? `~${Math.floor(remaining / matter.hourlyRate)} hrs left` : "Exhausted" },
+    { label: "Budget Total (Funded)", value: fmt(matter.budgetTotal), icon: DollarSign, sub: `Base Rate: ${fmt(matter.hourlyRate)}/hr` },
+    { label: "Consumed", value: fmt(matter.budgetUsed), icon: TrendingDown, sub: `${pct}% consumed` },
+    { label: "Remaining", value: fmt(remaining), icon: Clock, sub: remaining > 0 ? `~${Math.floor(remaining / matter.hourlyRate)} hrs left` : "Exhausted" },
   ];
 
   return (

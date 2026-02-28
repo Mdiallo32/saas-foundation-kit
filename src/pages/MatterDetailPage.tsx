@@ -1,16 +1,22 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, AlertTriangle, Download } from "lucide-react";
+import { ArrowLeft, Plus, AlertTriangle, Download, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 import MatterBudgetCards from "@/components/matters/MatterBudgetCards";
 import BudgetProgress from "@/components/matters/BudgetProgress";
 import TimesheetTable from "@/components/matters/TimesheetTable";
 import TimesheetModal from "@/components/matters/TimesheetModal";
 import InvoiceList from "@/components/invoices/InvoiceList";
-import { mockMatters, mockTimesheets, mockInvoices, type Timesheet } from "@/lib/mock-matters";
-import { mockClients } from "@/lib/mock-clients";
+import ProvisionInvoiceModal, { type ProvisionInvoiceData } from "@/components/invoices/ProvisionInvoiceModal";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { type Timesheet, type MatterStatus } from "@/types";
+import { useMatter, useTimesheets, useInvoices, useClients, useUpdateMatterStatus, useCreateProvisionInvoice, useMarkInvoicePaid } from "@/data/hooks";
+import { TableSkeleton } from "@/components/ui/skeleton-loaders";
 
 function downloadTimesheetsCSV(timesheets: Timesheet[], matterId: string) {
   const header = "Date,Collaborator,Hours,Description,Amount";
@@ -30,23 +36,53 @@ function downloadTimesheetsCSV(timesheets: Timesheet[], matterId: string) {
 const MatterDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [tsModalOpen, setTsModalOpen] = useState(false);
+  const [provisionModalOpen, setProvisionModalOpen] = useState(false);
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
 
-  const matter = mockMatters.find((m) => m.id === id);
-  const client = matter ? mockClients.find((c) => c.id === matter.clientId) : undefined;
-  const timesheets = useMemo(() => mockTimesheets.filter((t) => t.matterId === id), [id]);
-  const invoices = useMemo(() => mockInvoices.filter((i) => i.matterId === id), [id]);
+  // Queries
+  const { data: matter } = useMatter(id!);
+  const { data: clients } = useClients();
 
-  if (!matter) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64 gap-4">
-        <p className="text-muted-foreground">Matter not found.</p>
-        <Button variant="outline" size="sm" onClick={() => navigate("/matters")}>
-          <ArrowLeft className="h-4 w-4 mr-1.5" /> Back to Matters
-        </Button>
-      </div>
-    );
-  }
+  // Mutations
+  const { mutate: updateStatus } = useUpdateMatterStatus();
+  const { mutate: createProvision, isPending: invoiceLoading } = useCreateProvisionInvoice(id!);
+  const { mutate: markPaid } = useMarkInvoicePaid();
+
+  const client = clients.find((c) => c.id === matter.clientId);
+
+  const uiStatus = useMemo(() => {
+    if (matter.status === "closed") return "Closed";
+    if (matter.status === "pending") return "On hold";
+    return "Active";
+  }, [matter.status]);
+
+  const handleStatusChange = (val: string) => {
+    if (val === "Closed") {
+      setConfirmCloseOpen(true);
+    } else {
+      const status: MatterStatus = val === "On hold" ? "pending" : "in-progress";
+      updateStatus({ id: matter.id, status }, {
+        onSuccess: () => toast({ title: "Matter status updated" })
+      });
+    }
+  };
+
+  const handleAddProvision = (data: ProvisionInvoiceData) => {
+    createProvision(data, {
+      onSuccess: () => {
+        setProvisionModalOpen(false);
+        toast({ title: "Provision invoice created", description: "It will increase the funded budget once marked as paid." });
+      }
+    });
+  };
+
+  const handleMarkPaid = (invoiceId: string) => {
+    markPaid(invoiceId, {
+      onSuccess: () => toast({ title: "Provision received. Budget updated." })
+    });
+  };
 
   const remaining = matter.budgetTotal - matter.budgetUsed;
   const pct = matter.budgetTotal > 0 ? (matter.budgetUsed / matter.budgetTotal) * 100 : 0;
@@ -55,14 +91,39 @@ const MatterDetailPage = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate("/matters")} aria-label="Back to matters">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight font-heading">{matter.title}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-semibold tracking-tight">{matter.title}</h1>
+              <Badge variant={uiStatus === "Closed" ? "secondary" : uiStatus === "On hold" ? "outline" : "default"}>
+                {uiStatus}
+              </Badge>
+            </div>
             <p className="text-sm text-muted-foreground mt-0.5">{client?.name ?? "Unknown client"}</p>
+          </div>
+        </div>
+        <div className="flex gap-2 items-center">
+          <Select value={uiStatus} onValueChange={handleStatusChange}>
+            <SelectTrigger className="w-[130px] h-9">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="On hold">On hold</SelectItem>
+              <SelectItem value="Closed">Closed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="sm" onClick={() => setProvisionModalOpen(true)}>
+            <FileText className="h-4 w-4 mr-1.5" /> Fund Budget
+          </Button>
+          <div title={uiStatus === "Closed" ? "This matter is closed." : undefined}>
+            <Button size="sm" onClick={() => setTsModalOpen(true)} disabled={uiStatus === "Closed"}>
+              <Plus className="h-4 w-4 mr-1.5" /> Log Time
+            </Button>
           </div>
         </div>
       </div>
@@ -81,29 +142,98 @@ const MatterDetailPage = () => {
       <MatterBudgetCards matter={matter} />
       <BudgetProgress matter={matter} />
 
-      {/* Timesheets */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold font-heading">Timesheets</h2>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => downloadTimesheetsCSV(timesheets, matter.id)} disabled={timesheets.length === 0}>
-              <Download className="h-4 w-4 mr-1.5" /> Download CSV
-            </Button>
-            <Button size="sm" onClick={() => setTsModalOpen(true)}>
-              <Plus className="h-4 w-4 mr-1.5" /> Log Time
-            </Button>
-          </div>
-        </div>
-        <TimesheetTable timesheets={timesheets} />
-      </div>
+      <Suspense fallback={<TableSkeleton rows={3} />}>
+        <MatterTimesheetsSection matterId={matter.id} />
+      </Suspense>
 
-      {/* Invoices */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold font-heading">Invoices</h2>
-        <InvoiceList invoices={invoices} />
-      </div>
+      <Suspense fallback={<TableSkeleton rows={3} />}>
+        <MatterInvoicesSection
+          matterId={matter.id}
+          onAddProvision={() => setProvisionModalOpen(true)}
+          handleMarkPaid={handleMarkPaid}
+        />
+      </Suspense>
 
-      <TimesheetModal open={tsModalOpen} onOpenChange={setTsModalOpen} hourlyRate={matter.hourlyRate} />
+      <TimesheetModal
+        open={tsModalOpen}
+        onOpenChange={setTsModalOpen}
+        matterId={matter.id}
+        hourlyRate={matter.hourlyRate}
+      />
+
+      <ProvisionInvoiceModal
+        open={provisionModalOpen}
+        onOpenChange={setProvisionModalOpen}
+        onSave={handleAddProvision}
+        isLoading={invoiceLoading}
+        budgetTotal={matter.budgetTotal}
+        budgetRemaining={remaining}
+      />
+
+      <AlertDialog open={confirmCloseOpen} onOpenChange={setConfirmCloseOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Close this matter?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Closing a matter usually stops time entries. You can reopen it later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              updateStatus({ id: matter.id, status: "closed" }, {
+                onSuccess: () => toast({ title: "Matter closed" })
+              });
+            }}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+interface MatterSectionProps {
+  matterId: string;
+}
+
+const MatterTimesheetsSection = ({ matterId }: MatterSectionProps) => {
+  const { data: timesheets } = useTimesheets(matterId);
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-medium">Timesheets</h2>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 text-muted-foreground"
+          onClick={() => downloadTimesheetsCSV(timesheets, matterId)}
+          disabled={timesheets.length === 0}
+        >
+          <Download className="h-3.5 w-3.5 mr-1.5" /> Download CSV
+        </Button>
+      </div>
+      <TimesheetTable timesheets={timesheets} />
+    </div>
+  );
+};
+
+interface MatterInvoicesSectionProps extends MatterSectionProps {
+  onAddProvision: () => void;
+  handleMarkPaid: (invoiceId: string) => void;
+}
+
+const MatterInvoicesSection = ({ matterId, onAddProvision, handleMarkPaid }: MatterInvoicesSectionProps) => {
+  const { data: invoices } = useInvoices(matterId);
+  return (
+    <div className="space-y-3">
+      <h2 className="text-lg font-medium">Invoices</h2>
+      <InvoiceList
+        invoices={invoices}
+        onAddProvision={onAddProvision}
+        onMarkPaid={handleMarkPaid}
+      />
     </div>
   );
 };

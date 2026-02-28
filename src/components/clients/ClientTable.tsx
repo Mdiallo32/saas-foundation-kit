@@ -2,30 +2,35 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import type { Client } from "@/lib/mock-clients";
+import type { Client } from "@/types";
+import { TableEmptyState } from "@/components/ui/table-empty-state";
+import { TableSkeleton } from "@/components/ui/skeleton-loaders";
+import { Users } from "lucide-react";
 
 interface ClientTableProps {
   clients: Client[];
+  isLoading?: boolean;
 }
 
 const typeLabel = (c: Client) => (c.type === "company" ? "Company" : "Person");
 const identifier = (c: Client) => c.type === "company" ? c.vatNumber ?? "—" : c.nationalNumber ?? "—";
 
-const ClientTable = ({ clients }: ClientTableProps) => {
+import { ResponsiveTableLayout, TableCard } from "@/components/ui/responsive-table-layout";
+
+const ClientTable = ({ clients, isLoading = false }: ClientTableProps) => {
   const navigate = useNavigate();
 
+  if (isLoading) {
+    return <TableSkeleton columns={5} />;
+  }
+
   if (clients.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-40 text-muted-foreground">
-        No clients found.
-      </div>
-    );
+    return <TableEmptyState message="No clients found." icon={Users} />;
   }
 
   return (
-    <>
-      {/* Desktop table */}
-      <div className="hidden md:block rounded-lg border border-border overflow-hidden">
+    <ResponsiveTableLayout
+      desktop={
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/40">
@@ -52,12 +57,10 @@ const ClientTable = ({ clients }: ClientTableProps) => {
             ))}
           </TableBody>
         </Table>
-      </div>
-
-      {/* Mobile stacked cards */}
-      <div className="md:hidden space-y-3">
-        {clients.map((c) => (
-          <div key={c.id} className="rounded-lg border border-border p-4 space-y-1.5 bg-card cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => navigate(`/clients/${c.id}`)}>
+      }
+      mobile={
+        clients.map((c) => (
+          <TableCard key={c.id} onClick={() => navigate(`/clients/${c.id}`)}>
             <div className="flex items-center justify-between">
               <p className="font-medium text-sm">{c.name}</p>
               <Badge variant={c.type === "company" ? "default" : "secondary"} className="text-xs">
@@ -69,11 +72,12 @@ const ClientTable = ({ clients }: ClientTableProps) => {
               <span className="font-mono">{identifier(c)}</span>
               <span>{format(new Date(c.createdAt), "dd MMM yyyy")}</span>
             </div>
-          </div>
-        ))}
-      </div>
-    </>
+          </TableCard>
+        ))
+      }
+    />
   );
 };
+
 
 export default ClientTable;

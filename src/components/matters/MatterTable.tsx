@@ -5,6 +5,10 @@ import type { Matter } from "@/lib/mock-matters";
 import { mockClients } from "@/lib/mock-clients";
 import { fmtCurrency } from "@/lib/money";
 
+import { TableEmptyState } from "@/components/ui/table-empty-state";
+import { TableSkeleton } from "@/components/ui/skeleton-loaders";
+import { FolderOpen } from "lucide-react";
+
 const statusVariant: Record<Matter["status"], "default" | "secondary" | "outline" | "destructive"> = {
   open: "default",
   "in-progress": "secondary",
@@ -19,23 +23,25 @@ const clientName = (id: string) => mockClients.find((c) => c.id === id)?.name ??
 interface MatterTableProps {
   matters: Matter[];
   showClient?: boolean;
+  isLoading?: boolean;
 }
 
-const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
+import { ResponsiveTableLayout, TableCard } from "@/components/ui/responsive-table-layout";
+
+const MatterTable = ({ matters, showClient = false, isLoading = false }: MatterTableProps) => {
   const navigate = useNavigate();
 
+  if (isLoading) {
+    return <TableSkeleton columns={showClient ? 5 : 4} />;
+  }
+
   if (matters.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
-        No matters yet.
-      </div>
-    );
+    return <TableEmptyState message="No matters yet." icon={FolderOpen} />;
   }
 
   return (
-    <>
-      {/* Desktop */}
-      <div className="hidden md:block rounded-lg border border-border overflow-hidden">
+    <ResponsiveTableLayout
+      desktop={
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/40">
@@ -67,14 +73,12 @@ const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
             })}
           </TableBody>
         </Table>
-      </div>
-
-      {/* Mobile */}
-      <div className="md:hidden space-y-3">
-        {matters.map((m) => {
+      }
+      mobile={
+        matters.map((m) => {
           const remaining = m.budgetTotal - m.budgetUsed;
           return (
-            <div key={m.id} className="rounded-lg border border-border p-4 bg-card space-y-2 cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => navigate(`/matters/${m.id}`)}>
+            <TableCard key={m.id} onClick={() => navigate(`/matters/${m.id}`)}>
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">{m.title}</p>
                 <Badge variant={statusVariant[m.status]} className="capitalize text-xs">
@@ -90,12 +94,13 @@ const MatterTable = ({ matters, showClient = false }: MatterTableProps) => {
                   Remaining: {fmt(remaining)}
                 </span>
               </div>
-            </div>
+            </TableCard>
           );
-        })}
-      </div>
-    </>
+        })
+      }
+    />
   );
 };
+
 
 export default MatterTable;

@@ -19,7 +19,7 @@ const FinancePage = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight font-heading">Finance</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Finance</h1>
           <p className="text-sm text-muted-foreground mt-1">Firm performance &amp; forecasting</p>
         </div>
         <Select value={timeframe} onValueChange={setTimeframe}>
@@ -38,12 +38,12 @@ const FinancePage = () => {
       <FinanceTrendCard timeframe={tfLabel} />
 
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold font-heading">Open Invoices</h2>
+        <h2 className="text-lg font-medium">Open Invoices</h2>
         <OpenInvoicesTable />
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold font-heading">Revenue by Team Member</h2>
+        <h2 className="text-lg font-medium">Revenue by Team Member</h2>
         <RevenueByMember />
       </div>
     </div>

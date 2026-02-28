@@ -1,7 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardSkeleton } from "@/components/ui/skeleton-loaders";
 import { dashboardStats } from "@/lib/mock-data";
 
-export function SummaryCards() {
+export function SummaryCards({ isLoading = false }: { isLoading?: boolean }) {
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <CardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label="Dashboard summary">
       {dashboardStats.map((stat) => (

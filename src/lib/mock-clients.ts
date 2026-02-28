@@ -1,16 +1,4 @@
-export type ClientType = "physical" | "company";
-
-export interface Client {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  type: ClientType;
-  vatNumber?: string;
-  nationalNumber?: string;
-  createdAt: string;
-}
+import { Client } from "@/types";
 
 export const mockClients: Client[] = [
   { id: "1", name: "Meridian Holdings Ltd", email: "legal@meridian.com", phone: "+44 20 7946 0958", address: "12 King's Road, London EC2V 8AB", type: "company", vatNumber: "GB123456789", createdAt: "2026-01-15" },
