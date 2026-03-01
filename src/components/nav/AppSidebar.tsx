@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -7,6 +7,8 @@ import {
   DollarSign,
   Settings,
   Scale,
+  LogOut,
+  User,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -23,6 +25,14 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const mainNav = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -40,6 +50,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
 
   const isActive = (path: string) =>
@@ -51,14 +62,10 @@ export function AppSidebar() {
         <div className="flex items-center gap-2.5">
           <Scale className="h-6 w-6 shrink-0 text-sidebar-primary" />
           {!collapsed && (
-            <span className="font-display text-lg font-semibold text-sidebar-primary tracking-tight">
-              Lexicon
-            </span>
+            <span className="font-semibold tracking-tight">MANTRA</span>
           )}
         </div>
       </SidebarHeader>
-
-      <Separator className="bg-sidebar-border" />
 
       <SidebarContent className="pt-2">
         <SidebarGroup>
@@ -115,10 +122,45 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="px-4 pb-4">
-        {!collapsed && (
-          <p className="text-[11px] text-sidebar-muted">© 2026 Lexicon LLP</p>
-        )}
+      <SidebarFooter className="p-0 border-t border-sidebar-border bg-sidebar-accent/30">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16 w-full rounded-none px-4"
+            >
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarFallback className="bg-primary/10 text-primary font-medium rounded-lg">SC</AvatarFallback>
+              </Avatar>
+              {!collapsed && (
+                <div className="grid flex-1 text-left text-sm leading-tight ml-2">
+                  <span className="truncate font-semibold">Sarah Conner</span>
+                  <span className="truncate text-xs text-sidebar-muted">Managing Partner</span>
+                </div>
+              )}
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+            side={collapsed ? "right" : "bottom"}
+            align="end"
+            sideOffset={4}
+          >
+            <DropdownMenuItem onClick={() => navigate("/profile")}>
+              <User className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/settings")}>
+              <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
     </Sidebar>
   );

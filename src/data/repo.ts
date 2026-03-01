@@ -15,6 +15,35 @@ const delay = (ms: number = 200) => new Promise((resolve) => setTimeout(resolve,
 
 // --- Repository Functions ---
 
+// Settings
+const DEFAULT_SETTINGS = {
+    firmName: "Carter & Associates LLP",
+    slogan: "Trusted counsel, measurable results.",
+    vat: "GB123456789",
+    address: "12 King's Road, London EC2V 8AB",
+    email: "info@carterassociates.com",
+    phone: "+44 20 7946 0958",
+};
+
+export const getSettings = async () => {
+    await delay(100);
+    const stored = localStorage.getItem("firm_settings");
+    if (stored) {
+        try {
+            return JSON.parse(stored);
+        } catch (e) {
+            // ignore JSON parse error
+        }
+    }
+    return DEFAULT_SETTINGS;
+};
+
+export const updateSettings = async (payload: typeof DEFAULT_SETTINGS) => {
+    await delay(300);
+    localStorage.setItem("firm_settings", JSON.stringify(payload));
+    return payload;
+};
+
 // Clients
 export const listClients = async (): Promise<Client[]> => {
     await delay();

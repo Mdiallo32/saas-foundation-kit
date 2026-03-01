@@ -6,26 +6,38 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import LogoUploader from "@/components/settings/LogoUploader";
+import { useSettings, useUpdateSettings } from "@/data/hooks";
+import { Loader2 } from "lucide-react";
 
 const FirmInfoForm = () => {
-  const [values, setValues] = useState({
-    name: "Carter & Associates LLP",
-    slogan: "Trusted counsel, measurable results.",
-    vat: "GB123456789",
-    address: "12 King's Road, London EC2V 8AB",
-    email: "info@carterassociates.com",
-    phone: "+44 20 7946 0958",
-  });
+  const { data: settings } = useSettings();
+  const { mutate, isPending } = useUpdateSettings();
 
-  const set = (k: keyof typeof values, v: string) => setValues((p) => ({ ...p, [k]: v }));
+  const [localValues, setValues] = useState<any>(null);
+
+  const values = localValues ?? settings ?? {
+    firmName: "",
+    slogan: "",
+    vat: "",
+    address: "",
+    email: "",
+    phone: "",
+  };
+
+  const set = (k: keyof typeof values, v: string) => setValues((p: any) => ({ ...(p ?? values), [k]: v }));
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Saved", description: "Firm information updated." });
+    mutate(values, {
+      onSuccess: () => {
+        setValues(null);
+        toast({ title: "Saved", description: "Firm information updated." });
+      }
+    });
   };
 
   const fields: { key: keyof typeof values; label: string; type?: string; helper?: string }[] = [
-    { key: "name", label: "Firm Name" },
+    { key: "firmName", label: "Firm Name" },
     { key: "slogan", label: "Slogan", helper: "Displayed on invoices if enabled" },
     { key: "vat", label: "VAT Number" },
     { key: "address", label: "Address" },
@@ -70,7 +82,10 @@ const FirmInfoForm = () => {
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit" size="sm">Save Changes</Button>
+            <Button type="submit" size="sm" disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save Changes
+            </Button>
           </div>
         </form>
       </CardContent>

@@ -30,12 +30,6 @@ const Index = () => {
           <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
           <p className="text-sm text-muted-foreground mt-1">Here's an overview of your practice.</p>
         </div>
-        <button
-          onClick={triggerError}
-          className="text-xs text-muted-foreground hover:text-destructive underline underline-offset-4"
-        >
-          Simulate Error
-        </button>
       </div>
 
       {/* Components can now be written in the "happy path" without manual loading states */}

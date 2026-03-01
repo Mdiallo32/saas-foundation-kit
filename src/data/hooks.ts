@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./query-keys";
 import * as repo from "./repo";
 import { MatterStatus, Timesheet, Invoice, Client, Matter } from "@/types";
@@ -54,7 +54,25 @@ export const useTeam = () => {
     });
 };
 
+export const useSettings = () => {
+    return useQuery({
+        queryKey: QUERY_KEYS.settings,
+        queryFn: repo.getSettings,
+    });
+};
+
 // --- Mutations ---
+
+export const useUpdateSettings = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: repo.updateSettings,
+        onSuccess: (data) => {
+            queryClient.setQueryData(QUERY_KEYS.settings, data);
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.settings });
+        },
+    });
+};
 
 export const useCreateClient = () => {
     const queryClient = useQueryClient();

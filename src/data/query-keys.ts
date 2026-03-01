@@ -8,4 +8,5 @@ export const QUERY_KEYS = {
     team: ["team"] as const,
     dashboardStats: ["dashboard", "stats"] as const,
     recentActivity: ["dashboard", "activity"] as const,
+    settings: ["settings"] as const,
 };
