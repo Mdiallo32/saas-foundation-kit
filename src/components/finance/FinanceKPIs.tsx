@@ -1,4 +1,4 @@
-import { DollarSign, FileText, TrendingUp, Users, Flame, BarChart3 } from "lucide-react";
+import { Euro, FileText, TrendingUp, Users, Flame, BarChart3 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { mockTimesheets } from "@/lib/mock-matters";
 import { mockCollaborators } from "@/lib/mock-team";
@@ -12,7 +12,7 @@ const grossProfit = totalRevenue - totalCost;
 const margin = totalRevenue > 0 ? Math.round((grossProfit / totalRevenue) * 100) : 0;
 
 const kpis = [
-  { label: "Forecasted Profit", value: fmtCurrency(62400), sub: "This month", icon: DollarSign },
+  { label: "Forecasted Profit", value: fmtCurrency(62400), sub: "This month", icon: Euro },
   { label: "Gross Profit", value: fmtCurrency(grossProfit), sub: `${margin}% margin`, icon: BarChart3 },
   { label: "Open Invoices", value: "4", sub: fmtCurrency(18276), icon: FileText },
   { label: "ROI", value: "138%", sub: "+6% vs last quarter", icon: TrendingUp },

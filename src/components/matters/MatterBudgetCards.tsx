@@ -1,7 +1,7 @@
-import { DollarSign, TrendingDown, Clock } from "lucide-react";
+import { Euro, TrendingDown, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CardSkeleton } from "@/components/ui/skeleton-loaders";
-import type { Matter } from "@/lib/mock-matters";
+import type { Matter } from "@/types";
 import { fmtCurrency } from "@/lib/money";
 
 const fmt = fmtCurrency;
@@ -21,7 +21,7 @@ const MatterBudgetCards = ({ matter, isLoading = false }: { matter?: Matter; isL
   const pct = matter.budgetTotal > 0 ? Math.round((matter.budgetUsed / matter.budgetTotal) * 100) : 0;
 
   const cards = [
-    { label: "Budget Total (Funded)", value: fmt(matter.budgetTotal), icon: DollarSign, sub: `Base Rate: ${fmt(matter.hourlyRate)}/hr` },
+    { label: "Budget Total (Funded)", value: fmt(matter.budgetTotal), icon: Euro, sub: `Base Rate: ${fmt(matter.hourlyRate)}/hr` },
     { label: "Consumed", value: fmt(matter.budgetUsed), icon: TrendingDown, sub: `${pct}% consumed` },
     { label: "Remaining", value: fmt(remaining), icon: Clock, sub: remaining > 0 ? `~${Math.floor(remaining / matter.hourlyRate)} hrs left` : "Exhausted" },
   ];

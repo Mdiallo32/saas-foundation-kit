@@ -22,10 +22,10 @@ export const mockTimesheets: Timesheet[] = [
 ];
 
 export const mockInvoices: Invoice[] = [
-  { id: "inv1", matterId: "m1", reference: "INV-2026-0401", amountHT: 8400, vatRate: 0.21, status: "paid", issuedAt: "2026-02-01", kind: "provision" },
-  { id: "inv2", matterId: "m1", reference: "INV-2026-0412", amountHT: 5600, vatRate: 0.21, status: "pending", issuedAt: "2026-02-15", kind: "provision" },
-  { id: "inv3", matterId: "m3", reference: "INV-2026-0320", amountHT: 40000, vatRate: 0.21, status: "paid", issuedAt: "2026-01-20", kind: "provision" },
-  { id: "inv4", matterId: "m4", reference: "INV-2026-0405", amountHT: 6000, vatRate: 0.21, status: "pending", issuedAt: "2026-02-10", kind: "provision" },
-  { id: "inv5", matterId: "m5", reference: "INV-2026-0418", amountHT: 9000, vatRate: 0.21, status: "paid", issuedAt: "2026-02-05", kind: "provision" },
-  { id: "inv6", matterId: "m7", reference: "INV-2026-0422", amountHT: 2800, vatRate: 0.21, status: "pending", issuedAt: "2026-02-20", kind: "provision" },
+  { id: "inv1", matterId: "m1", reference: "INV-2026-0401", amountHT: 8400, vatRate: 0.21, status: "paid", paidAt: "2026-02-10", issuedAt: "2026-02-01", kind: "provision" },
+  { id: "inv2", matterId: "m1", reference: "INV-2026-0412", amountHT: 5600, vatRate: 0.21, status: "sent", issuedAt: "2026-02-15", dueDate: "2026-03-15", kind: "provision" },
+  { id: "inv3", matterId: "m3", reference: "INV-2026-0320", amountHT: 40000, vatRate: 0.21, status: "paid", paidAt: "2026-01-25", issuedAt: "2026-01-20", kind: "provision" },
+  { id: "inv4", matterId: "m4", reference: "INV-2026-0405", amountHT: 6000, vatRate: 0.21, status: "sent", issuedAt: "2026-02-10", dueDate: "2026-02-25", kind: "provision" }, // Overdue (Unpaid)
+  { id: "inv5", matterId: "m5", reference: "INV-2026-0418", amountHT: 9000, vatRate: 0.21, status: "paid", paidAt: "2026-02-12", issuedAt: "2026-02-05", kind: "provision" },
+  { id: "inv6", matterId: "m7", reference: "INV-2026-0422", amountHT: 2800, vatRate: 0.21, status: "sent", issuedAt: "2026-02-20", dueDate: "2026-03-20", kind: "provision" },
 ];

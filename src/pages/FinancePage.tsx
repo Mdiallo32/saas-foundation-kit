@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Download, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FinanceKPIs from "@/components/finance/FinanceKPIs";
 import OpenInvoicesTable from "@/components/finance/OpenInvoicesTable";
@@ -13,7 +16,17 @@ const timeframes = [
 
 const FinancePage = () => {
   const [timeframe, setTimeframe] = useState("30d");
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { toast } = useToast();
   const tfLabel = timeframes.find((t) => t.value === timeframe)?.label ?? "";
+
+  const handleDownload = () => {
+    setIsDownloading(true);
+    setTimeout(() => {
+      setIsDownloading(false);
+      toast({ title: "Report downloaded", description: "The finance report has been generated." });
+    }, 800);
+  };
 
   return (
     <div className="space-y-6">
@@ -22,16 +35,32 @@ const FinancePage = () => {
           <h1 className="text-2xl font-semibold tracking-tight">Finance</h1>
           <p className="text-sm text-muted-foreground mt-1">Firm performance &amp; forecasting</p>
         </div>
-        <Select value={timeframe} onValueChange={setTimeframe}>
-          <SelectTrigger className="w-44 h-9 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {timeframes.map((t) => (
-              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9"
+            onClick={handleDownload}
+            disabled={isDownloading}
+          >
+            {isDownloading ? (
+              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-1.5" />
+            )}
+            Download report
+          </Button>
+          <Select value={timeframe} onValueChange={setTimeframe}>
+            <SelectTrigger className="w-44 h-9 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {timeframes.map((t) => (
+                <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <FinanceKPIs />

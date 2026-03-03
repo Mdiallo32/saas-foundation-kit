@@ -23,6 +23,11 @@ const DEFAULT_SETTINGS = {
     address: "12 King's Road, London EC2V 8AB",
     email: "info@carterassociates.com",
     phone: "+44 20 7946 0958",
+    paymentTerms: 14,
+    vatRate: 21,
+    invoicePrefix: "INV-",
+    invoiceFooter: "Payment is due within the specified terms. Late payments may incur interest as permitted by law.",
+    showSlogan: true,
 };
 
 export const getSettings = async () => {
@@ -136,21 +141,47 @@ export const createTimesheet = async (matterId: string, payload: Omit<Timesheet,
 };
 
 // Invoices
-export const listInvoices = async (matterId: string): Promise<Invoice[]> => {
+export const getInvoice = async (id: string): Promise<Invoice> => {
+    await delay(100);
+    const inv = invoices.find((i) => i.id === id);
+    if (!inv) throw new Error("Invoice not found");
+    return inv;
+};
+
+export const listInvoices = async (matterId?: string): Promise<Invoice[]> => {
     await delay();
-    return invoices.filter((i) => i.matterId === matterId);
+    let list = invoices.filter(i => !i.archivedAt);
+    if (matterId) {
+        list = list.filter((i) => i.matterId === matterId);
+    }
+    return list;
+};
+
+export const updateInvoice = async (id: string, payload: Partial<Invoice>): Promise<Invoice> => {
+    await delay(200);
+    const index = invoices.findIndex((i) => i.id === id);
+    if (index === -1) throw new Error("Invoice not found");
+
+    const updatedInvoice = { ...invoices[index], ...payload };
+    invoices[index] = updatedInvoice;
+    return updatedInvoice;
 };
 
 export const createProvisionInvoice = async (matterId: string, payload: Pick<Invoice, "amountHT" | "issuedAt">): Promise<Invoice> => {
     await delay(300);
+    const issuedDateObj = new Date(payload.issuedAt);
+    const dueDateObj = new Date(issuedDateObj);
+    dueDateObj.setDate(dueDateObj.getDate() + 30); // 30 days default payment terms
+
     const newInvoice: Invoice = {
         id: `inv${Math.random().toString(36).substr(2, 5)}`,
         matterId,
         reference: `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`,
         amountHT: payload.amountHT,
         vatRate: 0.21,
-        status: "pending",
+        status: "draft", // Start as draft for preview
         issuedAt: payload.issuedAt,
+        dueDate: dueDateObj.toISOString().split("T")[0],
         kind: "provision",
     };
     invoices = [newInvoice, ...invoices];
@@ -162,7 +193,11 @@ export const markInvoicePaid = async (id: string): Promise<Invoice> => {
     const index = invoices.findIndex((i) => i.id === id);
     if (index === -1) throw new Error("Invoice not found");
 
-    const updatedInvoice = { ...invoices[index], status: "paid" as const };
+    const updatedInvoice = {
+        ...invoices[index],
+        status: "paid" as const,
+        paidAt: new Date().toISOString().split("T")[0]
+    };
     invoices[index] = updatedInvoice;
 
     // If it's a provision invoice, increase the matter budget total
@@ -176,6 +211,19 @@ export const markInvoicePaid = async (id: string): Promise<Invoice> => {
         }
     }
 
+    return updatedInvoice;
+};
+
+export const archiveInvoice = async (id: string): Promise<Invoice> => {
+    await delay(200);
+    const index = invoices.findIndex((i) => i.id === id);
+    if (index === -1) throw new Error("Invoice not found");
+
+    const updatedInvoice = {
+        ...invoices[index],
+        archivedAt: new Date().toISOString()
+    };
+    invoices[index] = updatedInvoice;
     return updatedInvoice;
 };
 

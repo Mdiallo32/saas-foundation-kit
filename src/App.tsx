@@ -12,6 +12,7 @@ import MattersPage from "./pages/MattersPage";
 import ClientsPage from "./pages/ClientsPage";
 import ClientDetailPage from "./pages/ClientDetailPage";
 import MatterDetailPage from "./pages/MatterDetailPage";
+import InvoiceDetailPage from "./pages/InvoiceDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/clients/:id" element={<PageBoundary><ClientDetailPage /></PageBoundary>} />
             <Route path="/matters" element={<PageBoundary fallback={<TablePageSkeleton />}><MattersPage /></PageBoundary>} />
             <Route path="/matters/:id" element={<PageBoundary><MatterDetailPage /></PageBoundary>} />
+            <Route path="/invoices/:id" element={<PageBoundary><InvoiceDetailPage /></PageBoundary>} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/finance" element={<FinancePage />} />
             <Route path="/settings" element={<SettingsPage />} />

@@ -7,11 +7,12 @@ interface PreviewProps {
   showSlogan: boolean;
   vatRate: string;
   footerNote: string;
+  paymentTerms: number;
 }
 
 const fmt = (n: number) => fmtCurrency(n, 2);
 
-const InvoiceTemplatePreview = ({ prefix, showSlogan, vatRate, footerNote }: PreviewProps) => {
+const InvoiceTemplatePreview = ({ prefix, showSlogan, vatRate, footerNote, paymentTerms }: PreviewProps) => {
   const amountHT = 8500;
   const rate = parseFloat(vatRate) || 21;
   const vat = amountHT * (rate / 100);
@@ -31,7 +32,7 @@ const InvoiceTemplatePreview = ({ prefix, showSlogan, vatRate, footerNote }: Pre
 
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>{prefix}2026-0501</span>
-          <span>Due: 14 days</span>
+          <span>Due: {paymentTerms} days</span>
         </div>
 
         <Separator />

@@ -11,6 +11,7 @@ import TimesheetTable from "@/components/matters/TimesheetTable";
 import TimesheetModal from "@/components/matters/TimesheetModal";
 import InvoiceList from "@/components/invoices/InvoiceList";
 import ProvisionInvoiceModal, { type ProvisionInvoiceData } from "@/components/invoices/ProvisionInvoiceModal";
+import InvoicePreviewModal from "@/components/invoices/InvoicePreviewModal";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -69,11 +70,13 @@ const MatterDetailPage = () => {
     }
   };
 
+  const [previewInvoice, setPreviewInvoice] = useState<any>(null);
+
   const handleAddProvision = (data: ProvisionInvoiceData) => {
-    createProvision(data, {
-      onSuccess: () => {
+    createProvision({ amountHT: data.amountHT, issuedAt: data.issueDate }, {
+      onSuccess: (newInvoice) => {
         setProvisionModalOpen(false);
-        toast({ title: "Provision invoice created", description: "It will increase the funded budget once marked as paid." });
+        setPreviewInvoice(newInvoice);
       }
     });
   };
@@ -190,6 +193,16 @@ const MatterDetailPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {previewInvoice && client && (
+        <InvoicePreviewModal
+          open={!!previewInvoice}
+          onOpenChange={(open) => !open && setPreviewInvoice(null)}
+          invoice={previewInvoice}
+          matter={matter}
+          client={client}
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { Users, Briefcase, AlertTriangle, FileWarning, DollarSign, Activity } from "lucide-react";
+import { Users, Briefcase, AlertTriangle, FileWarning, Euro, Activity } from "lucide-react";
 
 export const dashboardStats = [
   {
@@ -22,14 +22,14 @@ export const dashboardStats = [
   {
     label: "Unpaid Provisions",
     value: "9",
-    change: "$31,200 outstanding",
+    change: "31.200 € outstanding",
     icon: FileWarning,
   },
   {
     label: "Revenue (MTD)",
-    value: "$84,320",
+    value: "84.320 €",
     change: "+12% vs last month",
-    icon: DollarSign,
+    icon: Euro,
   },
   {
     label: "Team Utilization",
@@ -50,7 +50,7 @@ export const recentActivity = [
   {
     id: "2",
     action: "Invoice sent",
-    detail: "INV-2026-0412 — $8,500 to Meridian Holdings",
+    detail: "INV-2026-0412 — 8.500 € to Meridian Holdings",
     user: "James Okafor",
     time: "1 hr ago",
   },

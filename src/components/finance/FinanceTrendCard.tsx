@@ -23,7 +23,7 @@ const FinanceTrendCard = ({ timeframe }: { timeframe: string }) => (
           <AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
             <XAxis dataKey="month" tick={{ fontSize: 12 }} className="text-muted-foreground" />
-            <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />
+            <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k €`} className="text-muted-foreground" />
             <Tooltip
               formatter={(value: number) => fmtCurrency(value)}
               contentStyle={{ fontSize: 12, borderRadius: 8, borderColor: "hsl(var(--border))" }}

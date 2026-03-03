@@ -35,8 +35,7 @@ const FirmInfoForm = () => {
       }
     });
   };
-
-  const fields: { key: keyof typeof values; label: string; type?: string; helper?: string }[] = [
+  const fields: { key: keyof typeof values; label: string; type?: string; helper?: string; min?: number; max?: number }[] = [
     { key: "firmName", label: "Firm Name" },
     { key: "slogan", label: "Slogan", helper: "Displayed on invoices if enabled" },
     { key: "vat", label: "VAT Number" },
@@ -59,21 +58,23 @@ const FirmInfoForm = () => {
 
           <div className="grid sm:grid-cols-2 gap-4">
             {fields.map((f) => (
-              <div key={f.key} className="space-y-1.5">
-                <Label htmlFor={`firm-${f.key}`}>{f.label}</Label>
+              <div key={String(f.key)} className="space-y-1.5">
+                <Label htmlFor={`firm-${String(f.key)}`}>{f.label}</Label>
                 {f.key === "address" ? (
                   <Textarea
-                    id={`firm-${f.key}`}
+                    id={`firm-${String(f.key)}`}
                     rows={2}
                     value={values[f.key]}
                     onChange={(e) => set(f.key, e.target.value)}
                   />
                 ) : (
                   <Input
-                    id={`firm-${f.key}`}
+                    id={`firm-${String(f.key)}`}
                     type={f.type ?? "text"}
                     value={values[f.key]}
                     onChange={(e) => set(f.key, e.target.value)}
+                    min={f.min}
+                    max={f.max}
                   />
                 )}
                 {f.helper && <p className="text-xs text-muted-foreground">{f.helper}</p>}

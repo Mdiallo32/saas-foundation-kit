@@ -40,8 +40,11 @@ export interface Invoice {
     reference: string;
     amountHT: number;
     vatRate: number;
-    status: "pending" | "paid";
+    status: "draft" | "sent" | "paid";
     issuedAt: string;
+    dueDate?: string;
+    paidAt?: string | null;
+    archivedAt?: string | null;
     kind?: "provision" | "final";
 }
 

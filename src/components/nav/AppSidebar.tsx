@@ -4,7 +4,7 @@ import {
   Users,
   Briefcase,
   UsersRound,
-  DollarSign,
+  Euro,
   Settings,
   Scale,
   LogOut,
@@ -24,7 +24,6 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -39,7 +38,7 @@ const mainNav = [
   { title: "Clients", url: "/clients", icon: Users },
   { title: "Matters", url: "/matters", icon: Briefcase },
   { title: "Team", url: "/team", icon: UsersRound },
-  { title: "Finance", url: "/finance", icon: DollarSign },
+  { title: "Finance", url: "/finance", icon: Euro },
 ];
 
 const secondaryNav = [
@@ -69,7 +68,7 @@ export function AppSidebar() {
 
       <SidebarContent className="pt-2">
         <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel className="text-sidebar-muted text-[11px] uppercase tracking-widest font-medium">Main</SidebarGroupLabel>}
+          <SidebarGroupLabel className="text-sidebar-muted text-[11px] uppercase tracking-widest font-medium">Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNav.map((item) => (
@@ -96,7 +95,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel className="text-sidebar-muted text-[11px] uppercase tracking-widest font-medium">System</SidebarGroupLabel>}
+          <SidebarGroupLabel className="text-sidebar-muted text-[11px] uppercase tracking-widest font-medium">System</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {secondaryNav.map((item) => (
@@ -128,6 +127,7 @@ export function AppSidebar() {
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16 w-full rounded-none px-4"
+              tooltip="Sarah Conner"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarFallback className="bg-primary/10 text-primary font-medium rounded-lg">SC</AvatarFallback>
