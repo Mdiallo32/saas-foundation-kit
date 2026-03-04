@@ -1,73 +1,97 @@
-# Welcome to your MANTRA project
+# Mantra: Legal Practice Management (AS-IS)
 
-## Project info
+A robust, modern SaaS applications, specifically tailored for **Legal Practice Management** but adaptable for any service-based business. 
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Project Overview
 
-## How can I edit this code?
+This project provides a comprehensive dashboard for managing clients, matters, team members, and financial invoicing. It is built as a **Single Page Application (SPA)** with a focus on ease of use, clean design, and a solid developer experience.
 
-There are several ways of editing your application.
+> [!NOTE]
+> This project currently operates in a **Mocked State**. Data is managed in-memory with persistence to `localStorage` for certain settings, making it an ideal starting point for full backend integration.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 🚀 Key Features
 
-Changes made via Lovable will be committed automatically to this repo.
+### 👥 Client & Matter Management
+- **Centralized Client Database**: Complete CRUD operations for client profiles.
+- **Matter Tracking**: Manage legal matters (projects) with detailed views, status tracking, and budget monitoring.
+- **Matter Details**: Deep-dive into specific matters, including budget utilization (Budget Used vs. Total Budget).
 
-**Use your preferred IDE**
+### 💳 Finance & Invoices
+- **Financial Dashboard**: Overview of key financial metrics like Monthly Revenue and Pending Invoices.
+- **Invoice Generation**: Create **Provision Invoices** with automatic reference generation.
+- **Invoice Lifecycle**: Track status from "Draft" to "Sent" and "Paid". 
+- **Global Financial Settings**: Support for EUR (€) formatting, customizable VAT rates, and payment terms.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 👥 Team & Roles
+- **Team Management**: List and manage collaborators.
+- **Role-Based Views**: Support for role-based logic (Admin/Lawyer).
+- **Recent Update**: The legacy "Master" role has been unified into the "Admin" role for better consistency.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### ⚙️ Firm Settings
+- **Identity & Contact**: Manage Firm Name, Slogan, Address, and Contact info.
+- **Financial Options**: Configure Invoice Prefix, Footer text, Default VAT rate, and Payment terms (Days).
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🛠️ Technology Stack
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+| Category | Technology |
+| :--- | :--- |
+| **Frontend Framework** | [Vite](https://vitejs.dev/) + [React 18](https://reactjs.org/) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) |
+| **UI Components** | [shadcn/ui](https://ui.shadcn.com/) (based on Radix UI) |
+| **Data Fetching** | [TanStack Query v5](https://tanstack.com/query/latest) (React Query) |
+| **Navigation** | [React Router DOM v6](https://reactrouter.com/) |
+| **Forms & Validation** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
+| **Testing** | [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/) |
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## 📁 Project Structure
+
+```text
+src/
+├── components/   # UI components (shadcn/ui + custom)
+│   ├── boundaries/   # Error & Page loading boundaries
+│   ├── dashboard/    # Index/Home page components
+│   ├── shared/       # Reusable layout elements
+│   └── ui/           # Basic UI primitives (Button, Input, etc.)
+├── data/         # Data management (Query hooks & Mock Repository)
+├── hooks/        # Custom React hooks
+├── layouts/      # Main Application Layouts (Sidebar, Header)
+├── lib/          # Utilities (Formatting, Mock data, Constants)
+├── pages/        # Application views (Index, Clients, Finance, etc.)
+├── types/        # TypeScript definitions
+└── App.tsx       # Main router and provider configuration
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 💻 Getting Started
 
-**Use GitHub Codespaces**
+1. **Install Dependencies**:
+   ```sh
+   npm install
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. **Run Development Server**:
+   ```sh
+   npm run dev
+   ```
 
-## What technologies are used for this project?
+3. **Run Tests**:
+   ```sh
+   npm run test
+   ```
 
-This project is built with:
+## 📝 Roadmap & AS-IS State
+Currently, all data is managed via the `src/data/repo.ts` module which simulates an API with in-memory storage and `localStorage`. 
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **AS-IS Role Logic**: User roles are "Admin" and "Lawyer".
+- **AS-IS Currency**: Hardcoded to **EUR (€)**.
+- **AS-IS Data**: Populated with mock clients (Sarah Chen, Carter & Associates LLP, etc.) for demonstration.
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---

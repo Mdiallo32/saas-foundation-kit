@@ -33,7 +33,7 @@ const App = () => (
             <Route path="/matters" element={<PageBoundary fallback={<TablePageSkeleton />}><MattersPage /></PageBoundary>} />
             <Route path="/matters/:id" element={<PageBoundary><MatterDetailPage /></PageBoundary>} />
             <Route path="/invoices/:id" element={<PageBoundary><InvoiceDetailPage /></PageBoundary>} />
-            <Route path="/team" element={<TeamPage />} />
+            <Route path="/team" element={<PageBoundary><TeamPage /></PageBoundary>} />
             <Route path="/finance" element={<FinancePage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />

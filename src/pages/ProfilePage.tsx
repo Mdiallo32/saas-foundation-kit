@@ -9,11 +9,12 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, KeyRound } from "lucide-react";
+import { formatUserRole } from "@/lib/role";
 
 const currentUser = {
   name: "Sarah Chen",
   email: "s.chen@firm.com",
-  role: "master" as const,
+  role: "admin" as const,
 };
 
 const ProfilePage = () => {
@@ -84,8 +85,8 @@ const ProfilePage = () => {
 
           <div className="flex items-center gap-2">
             <Label className="text-sm text-muted-foreground">Role</Label>
-            <Badge variant={currentUser.role === "master" ? "default" : "secondary"}>
-              {currentUser.role === "master" ? "Master" : "Collaborator"}
+            <Badge variant={currentUser.role === "admin" ? "default" : "secondary"}>
+              {formatUserRole(currentUser.role)}
             </Badge>
           </div>
 

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./query-keys";
 import * as repo from "./repo";
-import { MatterStatus, Timesheet, Invoice, Client, Matter } from "@/types";
+import { MatterStatus, Timesheet, Invoice, Client, Matter, Collaborator } from "@/types";
 
 // --- Queries ---
 
@@ -65,6 +65,13 @@ export const useSettings = () => {
     return useQuery({
         queryKey: QUERY_KEYS.settings,
         queryFn: repo.getSettings,
+    });
+};
+
+export const useUser = () => {
+    return useSuspenseQuery({
+        queryKey: ["currentUser"],
+        queryFn: repo.getCurrentUser,
     });
 };
 
@@ -191,6 +198,27 @@ export const useArchiveInvoice = () => {
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices(data.matterId) });
             queryClient.invalidateQueries({ queryKey: ["invoices"] });
+        },
+    });
+};
+
+export const useCreateCollaborator = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: repo.createCollaborator,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.team });
+        },
+    });
+};
+
+export const useUpdateCollaborator = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, ...payload }: Partial<Collaborator> & { id: string }) =>
+            repo.updateCollaborator(id, payload),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.team });
         },
     });
 };

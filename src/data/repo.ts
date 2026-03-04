@@ -10,6 +10,12 @@ let timesheets: Timesheet[] = [...mockTimesheets];
 let invoices: Invoice[] = [...mockInvoices];
 let team: Collaborator[] = [...mockCollaborators];
 
+const currentUser = {
+    name: "Sarah Chen",
+    email: "s.chen@firm.com",
+    role: "admin" as const, // admin role
+};
+
 // --- Helper ---
 const delay = (ms: number = 200) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -242,4 +248,19 @@ export const createCollaborator = async (payload: Omit<Collaborator, "id" | "mat
     };
     team = [newCollaborator, ...team];
     return newCollaborator;
+};
+
+export const updateCollaborator = async (id: string, payload: Partial<Collaborator>): Promise<Collaborator> => {
+    await delay(300);
+    const index = team.findIndex((c) => c.id === id);
+    if (index === -1) throw new Error("Collaborator not found");
+
+    const updated = { ...team[index], ...payload };
+    team[index] = updated;
+    return updated;
+};
+
+export const getCurrentUser = async () => {
+    await delay(50);
+    return currentUser;
 };
