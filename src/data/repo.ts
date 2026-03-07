@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { uploadToR2 } from "@/lib/r2";
+import { parseDate } from "@/lib/date";
 import { Client, Matter, Timesheet, Invoice, Collaborator, MatterStatus } from "@/types";
 
 // --- Mappers (DB snake_case → TS camelCase) ---
@@ -13,7 +14,7 @@ const mapClient = (row: Record<string, unknown>): Client => ({
     type: (row.type as Client["type"]) ?? "company",
     vatNumber: row.vat_number as string | undefined,
     nationalNumber: row.national_number as string | undefined,
-    createdAt: ((row.created_at as string) ?? "").split("T")[0],
+    createdAt: parseDate(row.created_at as string) ?? new Date(),
 });
 
 const mapMatter = (row: Record<string, unknown>): Matter => ({
@@ -32,7 +33,7 @@ const mapTimesheet = (row: Record<string, unknown>): Timesheet => ({
     description: (row.description as string) ?? "",
     hours: Number(row.hours ?? 0),
     rate: (row.rate as number) ?? 0,
-    date: (row.date as string) ?? "",
+    date: parseDate(row.date as string) ?? new Date(),
     user: (row.profile_id as string) ?? "",
 });
 
@@ -44,10 +45,10 @@ const mapInvoice = (row: Record<string, unknown>): Invoice => ({
     vatRate: (row.vat_rate as number) ?? 21,
     status: (row.status as Invoice["status"]) ?? "draft",
     kind: (row.kind as Invoice["kind"]) ?? "final",
-    issuedAt: (row.issued_at as string) ?? "",
-    dueDate: (row.due_date as string) ?? undefined,
-    paidAt: (row.paid_at as string | null) ?? null,
-    archivedAt: (row.archived_at as string | null) ?? null,
+    issuedAt: parseDate(row.issued_at as string) ?? new Date(),
+    dueDate: (row.due_date as string | null) ? parseDate(row.due_date as string) : undefined,
+    paidAt: (row.paid_at as string | null) ? parseDate(row.paid_at as string) : null,
+    archivedAt: (row.archived_at as string | null) ? parseDate(row.archived_at as string) : null,
 });
 
 const mapCollaborator = (row: Record<string, unknown>, matterIds: string[] = []): Collaborator => ({

@@ -22,7 +22,7 @@ export interface Client {
     type: ClientType;
     vatNumber?: string;
     nationalNumber?: string;
-    createdAt: string;
+    createdAt: Date | string;
 }
 
 export type MatterStatus = "open" | "in-progress" | "pending" | "closed";
@@ -43,7 +43,7 @@ export interface Timesheet {
     description: string;
     hours: number;
     rate: number;
-    date: string;
+    date: Date | string;
     user: string;
 }
 
@@ -54,10 +54,10 @@ export interface Invoice {
     amountHT: number;
     vatRate: number;
     status: "draft" | "sent" | "paid";
-    issuedAt: string;
-    dueDate?: string;
-    paidAt?: string | null;
-    archivedAt?: string | null;
+    issuedAt: Date | string;
+    dueDate?: Date | string;
+    paidAt?: Date | string | null;
+    archivedAt?: Date | string | null;
     kind?: "provision" | "final";
 }
 
@@ -83,5 +83,5 @@ export interface ActivityItem {
     action: string;
     detail: string;
     user: string;
-    time: string;
+    time: Date | string;
 }
