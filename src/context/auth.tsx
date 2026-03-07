@@ -31,13 +31,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (error) {
                 console.error("loadProfile error:", error);
                 setProfile(null);
+                setLoading(false);
                 return;
             }
             setProfile(data as Profile);
+            setLoading(false);
         } catch (err) {
             console.error("loadProfile exception:", err);
             setProfile(null);
-        } finally {
             setLoading(false);
         }
     };
