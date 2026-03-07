@@ -26,7 +26,8 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useSignedUrl } from "@/hooks/useSignedUrl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,6 +57,7 @@ export function AppSidebar() {
   const { profile, signOut } = useAuth();
   const displayName = profile?.name || "Utilisateur";
   const initials = displayName.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+  const avatarUrl = useSignedUrl(profile?.avatar_r2_key);
 
   const isActive = (path: string) =>
     path === "/" ? currentPath === "/" : currentPath.startsWith(path);
@@ -135,6 +137,7 @@ export function AppSidebar() {
               tooltip={displayName}
             >
               <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage src={avatarUrl} alt={displayName} className="rounded-lg object-cover" />
                 <AvatarFallback className="bg-primary/10 text-primary font-medium rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               {!collapsed && (

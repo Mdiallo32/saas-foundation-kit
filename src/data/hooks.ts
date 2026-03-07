@@ -226,3 +226,16 @@ export const useUpdateCollaborator = () => {
         },
     });
 };
+
+export const useUploadAvatar = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: repo.uploadAvatar,
+        onSuccess: (key) => {
+            // Invalidate the signed URL cache for this key so AppSidebar re-fetches
+            queryClient.invalidateQueries({ queryKey: ["signedUrl", key] });
+            // Team list shows avatars too — keep it in sync
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.team });
+        },
+    });
+};

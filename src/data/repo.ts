@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { uploadToR2 } from "@/lib/r2";
 import { Client, Matter, Timesheet, Invoice, Collaborator, MatterStatus } from "@/types";
 
 // --- Mappers (DB snake_case → TS camelCase) ---
@@ -508,4 +509,25 @@ export const getCurrentUser = async () => {
         email: (profile?.email as string) ?? session.user.email ?? "",
         role: ((profile?.role as string) ?? "lawyer") as "admin" | "lawyer" | "billing",
     };
+};
+
+// --- Avatar Upload ---
+
+/**
+ * Upload a new profile avatar to R2 and persist the key in the profiles table.
+ * Returns the R2 object key so callers can update signed URL caches.
+ */
+export const uploadAvatar = async (file: File): Promise<string> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) throw new Error("Not authenticated");
+
+    const key = await uploadToR2("profile_avatar", session.user.id, file);
+
+    const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_r2_key: key, updated_at: new Date().toISOString() })
+        .eq("id", session.user.id);
+
+    if (error) throw error;
+    return key;
 };

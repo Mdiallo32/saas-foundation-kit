@@ -10,6 +10,8 @@ interface AuthContextType {
     loading: boolean;
     signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
+    /** Re-fetch the current user's profile (e.g. after uploading a new avatar). */
+    refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -38,6 +40,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const refreshProfile = async () => {
+        const { data: { session: current } } = await supabase.auth.getSession();
+        if (current?.user) await loadProfile(current.user.id);
     };
 
     useEffect(() => {
@@ -75,6 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             loading,
             signIn,
             signOut,
+            refreshProfile,
         }}>
             {children}
         </AuthContext.Provider>
