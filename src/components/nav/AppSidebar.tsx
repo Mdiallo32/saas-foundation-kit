@@ -163,7 +163,14 @@ export function AppSidebar() {
               <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut().catch((err) => console.error("Sign out failed", err))}>
+            <DropdownMenuItem onClick={async () => {
+              try {
+                await signOut();
+                navigate("/login");
+              } catch (err) {
+                console.error("Sign out failed", err);
+              }
+            }}>
               <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Log out</span>
             </DropdownMenuItem>
