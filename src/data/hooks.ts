@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./query-keys";
 import * as repo from "./repo";
 import { MatterStatus, Timesheet, Invoice, Client, Matter, Collaborator } from "@/types";
@@ -42,14 +42,14 @@ export const useTimesheets = (matterId: string) => {
 
 export const useInvoices = (matterId?: string) => {
     return useSuspenseQuery({
-        queryKey: matterId ? QUERY_KEYS.invoices(matterId) : ["invoices"],
+        queryKey: matterId ? QUERY_KEYS.invoices(matterId) : QUERY_KEYS.allInvoices,
         queryFn: () => repo.listInvoices(matterId),
     });
 };
 
 export const useInvoice = (id: string) => {
-    return useQuery({
-        queryKey: ["invoice", id],
+    return useSuspenseQuery({
+        queryKey: QUERY_KEYS.invoice(id),
         queryFn: () => repo.getInvoice(id),
     });
 };
@@ -62,7 +62,7 @@ export const useTeam = () => {
 };
 
 export const useSettings = () => {
-    return useQuery({
+    return useSuspenseQuery({
         queryKey: QUERY_KEYS.settings,
         queryFn: repo.getSettings,
     });
@@ -70,7 +70,7 @@ export const useSettings = () => {
 
 export const useUser = () => {
     return useSuspenseQuery({
-        queryKey: ["currentUser"],
+        queryKey: QUERY_KEYS.currentUser,
         queryFn: repo.getCurrentUser,
     });
 };
@@ -138,7 +138,7 @@ export const useCreateProvisionInvoice = (matterId: string) => {
     return useMutation({
         mutationFn: (payload: Pick<Invoice, "amountHT" | "issuedAt">) =>
             repo.createProvisionInvoice(matterId, payload),
-        onSuccess: (data) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices(matterId) });
         },
     });
@@ -150,6 +150,7 @@ export const useMarkInvoicePaid = () => {
         mutationFn: repo.markInvoicePaid,
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices(data.matterId) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoice(data.id) });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.matter(data.matterId) });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.matters });
         },
@@ -163,6 +164,7 @@ export const useUpdateInvoiceStatus = () => {
             repo.updateInvoice(id, { status }),
         onSuccess: (data: Invoice) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices(data.matterId) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoice(data.id) });
         },
     });
 };
@@ -174,7 +176,8 @@ export const useUpdateInvoice = () => {
             repo.updateInvoice(id, payload),
         onSuccess: (data: Invoice) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices(data.matterId) });
-            queryClient.invalidateQueries({ queryKey: ["invoices"] });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoice(data.id) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allInvoices });
         },
     });
 };
@@ -197,7 +200,8 @@ export const useArchiveInvoice = () => {
         mutationFn: repo.archiveInvoice,
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices(data.matterId) });
-            queryClient.invalidateQueries({ queryKey: ["invoices"] });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoice(data.id) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allInvoices });
         },
     });
 };

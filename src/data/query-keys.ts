@@ -4,9 +4,12 @@ export const QUERY_KEYS = {
     matters: ["matters"] as const,
     matter: (id: string) => ["matters", id] as const,
     timesheets: (matterId: string) => ["timesheets", { matterId }] as const,
+    allInvoices: ["invoices"] as const,
     invoices: (matterId: string) => ["invoices", { matterId }] as const,
+    invoice: (id: string) => ["invoices", "detail", id] as const,
     team: ["team"] as const,
     dashboardStats: ["dashboard", "stats"] as const,
     recentActivity: ["dashboard", "activity"] as const,
     settings: ["settings"] as const,
+    currentUser: ["currentUser"] as const,
 };

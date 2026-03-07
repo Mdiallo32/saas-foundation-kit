@@ -1,4 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/context/auth";
+import { formatUserRole } from "@/lib/role";
 import {
   LayoutDashboard,
   Users,
@@ -51,6 +53,9 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
+  const { profile, signOut } = useAuth();
+  const displayName = profile?.name || "Utilisateur";
+  const initials = displayName.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 
   const isActive = (path: string) =>
     path === "/" ? currentPath === "/" : currentPath.startsWith(path);
@@ -127,15 +132,15 @@ export function AppSidebar() {
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16 w-full rounded-none px-4"
-              tooltip="Sarah Conner"
+              tooltip={displayName}
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="bg-primary/10 text-primary font-medium rounded-lg">SC</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary font-medium rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               {!collapsed && (
                 <div className="grid flex-1 text-left text-sm leading-tight ml-2">
-                  <span className="truncate font-semibold">Sarah Conner</span>
-                  <span className="truncate text-xs text-sidebar-muted">Managing Partner</span>
+                  <span className="truncate font-semibold">{displayName}</span>
+                  <span className="truncate text-xs text-sidebar-muted">{formatUserRole(profile?.role)}</span>
                 </div>
               )}
             </SidebarMenuButton>
@@ -155,7 +160,7 @@ export function AppSidebar() {
               <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => signOut().catch((err) => console.error("Sign out failed", err))}>
               <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Log out</span>
             </DropdownMenuItem>

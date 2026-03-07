@@ -1,6 +1,16 @@
 export type ClientType = "physical" | "company";
 export type UserRole = "admin" | "lawyer" | "billing" | string;
 
+export interface Profile {
+    id: string;
+    firm_id: string | null;
+    email: string;
+    name: string | null;
+    role: "admin" | "lawyer" | "billing";
+    hourly_rate: number | null;
+    avatar_r2_key: string | null;
+}
+
 export const isAdminRole = (role?: string) => role?.toLowerCase() === "admin";
 
 export interface Client {
