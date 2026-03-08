@@ -49,10 +49,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        // Rely solely on onAuthStateChange — it fires INITIAL_SESSION on mount,
-        // covering the cold-start case without the duplicate loadProfile call
-        // that a parallel getSession() would cause.
+        // Safety timeout — if auth doesn't resolve in 8s, bail to login page
+        const timeout = setTimeout(() => {
+            setProfile(null);
+            setLoading(false);
+        }, 8000);
+
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
+            clearTimeout(timeout);
             setSession(session);
             if (session?.user) {
                 await loadProfile(session.user.id);
@@ -62,7 +66,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
         });
 
-        return () => subscription.unsubscribe();
+        return () => {
+            clearTimeout(timeout);
+            subscription.unsubscribe();
+        };
     }, []);
 
     const signIn = async (email: string, password: string) => {
