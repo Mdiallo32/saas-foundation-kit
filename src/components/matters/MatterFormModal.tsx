@@ -29,7 +29,7 @@ const MatterFormModal = ({ open, onOpenChange, initialClientId }: MatterFormModa
   const [errors, setErrors] = useState<Partial<Record<keyof Fields, string>>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const { mutate: createMatter, isPending } = useCreateMatter();
+  const { mutateAsync: createMatter, isPending } = useCreateMatter();
   const { data: clients } = useClients();
   const { toast } = useToast();
 
@@ -55,24 +55,25 @@ const MatterFormModal = ({ open, onOpenChange, initialClientId }: MatterFormModa
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (ev: React.FormEvent) => {
+  const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     setSubmitted(true);
     if (!validate()) return;
 
-    createMatter({
-      title: values.title.trim(),
-      clientId: values.clientId,
-      budgetTotal: Number(values.budgetInitial),
-      hourlyRate: values.hourlyRate ? Number(values.hourlyRate) : 0,
-      status: "open",
-    }, {
-      onSuccess: (data) => {
-        toast({ title: "Matter created", description: `${data.title} has been added.` });
-        onOpenChange(false);
-        reset();
-      }
-    });
+    try {
+      const data = await createMatter({
+        title: values.title.trim(),
+        clientId: values.clientId,
+        budgetTotal: Number(values.budgetInitial),
+        hourlyRate: values.hourlyRate ? Number(values.hourlyRate) : 0,
+        status: "open",
+      });
+      toast({ title: "Matter created", description: `${data.title} has been added.` });
+      onOpenChange(false);
+      reset();
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to create matter", variant: "destructive" });
+    }
   };
 
   const reset = () => {

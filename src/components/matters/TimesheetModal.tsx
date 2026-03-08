@@ -24,7 +24,7 @@ const TimesheetModal = ({ open, onOpenChange, matterId, hourlyRate }: TimesheetM
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const { mutate: createTimesheet, isPending } = useCreateTimesheet(matterId);
+  const { mutateAsync: createTimesheet, isPending } = useCreateTimesheet(matterId);
   const { toast } = useToast();
 
   const hoursNum = parseFloat(hours) || 0;
@@ -39,24 +39,29 @@ const TimesheetModal = ({ open, onOpenChange, matterId, hourlyRate }: TimesheetM
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (ev: React.FormEvent) => {
+  const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     setSubmitted(true);
     if (!validate()) return;
 
-    createTimesheet({
-      description: description.trim(),
-      hours: hoursNum,
-      rate: hourlyRate,
-      date: format(new Date(), "yyyy-MM-dd"),
-      user: "Sarah Chen", // Should ideally come from auth context
-    }, {
-      onSuccess: () => {
-        toast({ title: "Time entry logged", description: "Matter budget has been updated." });
-        onOpenChange(false);
-        reset();
-      }
-    });
+    try {
+      await createTimesheet({
+        description: description.trim(),
+        hours: hoursNum,
+        rate: hourlyRate,
+        date: format(new Date(), "yyyy-MM-dd"),
+        user: "Sarah Chen", // Should ideally come from auth context
+      });
+      toast({ title: "Time entry logged", description: "Matter budget has been updated." });
+      onOpenChange(false);
+      reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to log time entry. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const reset = () => {

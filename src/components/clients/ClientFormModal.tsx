@@ -33,8 +33,8 @@ const ClientFormModal = ({ open, onOpenChange, mode = "create", initialData }: C
   const [errors, setErrors] = useState<Partial<Record<FieldName | "type", string>>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const { mutate: createClient, isPending: isCreating } = useCreateClient();
-  const { mutate: updateClient, isPending: isUpdating } = useUpdateClient();
+  const { mutateAsync: createClient, isPending: isCreating } = useCreateClient();
+  const { mutateAsync: updateClient, isPending: isUpdating } = useUpdateClient();
   const isPending = isCreating || isUpdating;
   const { toast } = useToast();
 
@@ -65,7 +65,7 @@ const ClientFormModal = ({ open, onOpenChange, mode = "create", initialData }: C
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (ev: React.FormEvent) => {
+  const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     setSubmitted(true);
     if (!validate()) return;
@@ -79,21 +79,19 @@ const ClientFormModal = ({ open, onOpenChange, mode = "create", initialData }: C
       ...(clientType === "company" ? { vatNumber: values.vatNumber.trim() } : { nationalNumber: values.nationalNumber.trim() }),
     };
 
-    if (isEdit && initialData) {
-      updateClient({ id: initialData.id, ...payload }, {
-        onSuccess: (data) => {
-          toast({ title: "Client updated", description: `${data.name} has been updated.` });
-          onOpenChange(false);
-        }
-      });
-    } else {
-      createClient(payload, {
-        onSuccess: (data) => {
-          toast({ title: "Client created", description: `${data.name} has been added.` });
-          onOpenChange(false);
-          reset();
-        }
-      });
+    try {
+      if (isEdit && initialData) {
+        const data = await updateClient({ id: initialData.id, ...payload });
+        toast({ title: "Client updated", description: `${data.name} has been updated.` });
+        onOpenChange(false);
+      } else {
+        const data = await createClient(payload);
+        toast({ title: "Client created", description: `${data.name} has been added.` });
+        onOpenChange(false);
+        reset();
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to save client", variant: "destructive" });
     }
   };
 

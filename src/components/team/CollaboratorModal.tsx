@@ -30,8 +30,8 @@ const CollaboratorModal = ({ open, onOpenChange, collaborator }: CollaboratorMod
   const [errors, setErrors] = useState<Partial<Record<keyof Fields, string>>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const { mutate: createCollab, isPending: isCreating } = useCreateCollaborator();
-  const { mutate: updateCollab, isPending: isUpdating } = useUpdateCollaborator();
+  const { mutateAsync: createCollab, isPending: isCreating } = useCreateCollaborator();
+  const { mutateAsync: updateCollab, isPending: isUpdating } = useUpdateCollaborator();
   const isPending = isCreating || isUpdating;
   const { toast } = useToast();
 
@@ -62,7 +62,7 @@ const CollaboratorModal = ({ open, onOpenChange, collaborator }: CollaboratorMod
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (ev: React.FormEvent) => {
+  const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     setSubmitted(true);
     if (!validate()) return;
@@ -74,19 +74,20 @@ const CollaboratorModal = ({ open, onOpenChange, collaborator }: CollaboratorMod
       hourlyRate: values.hourlyRate.trim() ? Number(values.hourlyRate) : 0,
     };
 
-    if (isEdit && collaborator) {
-      updateCollab({ id: collaborator.id, ...payload }, {
-        onSuccess: () => {
-          toast({ title: "Collaborator updated", description: `${payload.name}'s profile has been updated.` });
-          onOpenChange(false);
-        }
-      });
-    } else {
-      createCollab(payload, {
-        onSuccess: () => {
-          toast({ title: "Collaborator added", description: `${payload.name} has been added to the team.` });
-          onOpenChange(false);
-        }
+    try {
+      if (isEdit && collaborator) {
+        await updateCollab({ id: collaborator.id, ...payload });
+        toast({ title: "Collaborator updated", description: `${payload.name}'s profile has been updated.` });
+      } else {
+        await createCollab(payload);
+        toast({ title: "Collaborator added", description: `${payload.name} has been added to the team.` });
+      }
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save collaborator. Please try again.",
+        variant: "destructive",
       });
     }
   };
